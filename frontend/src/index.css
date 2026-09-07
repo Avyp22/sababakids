@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    margin: 0;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+    :root {
+        --background: 40 43% 98%;
+        --foreground: 205 22% 14%;
+        --card: 0 0% 100%;
+        --card-foreground: 205 22% 14%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 205 22% 14%;
+        --primary: 9 71% 58%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 146 34% 35%;
+        --secondary-foreground: 0 0% 100%;
+        --muted: 40 30% 94%;
+        --muted-foreground: 205 12% 41%;
+        --accent: 38 91% 55%;
+        --accent-foreground: 205 22% 14%;
+        --destructive: 0 72% 51%;
+        --destructive-foreground: 0 0% 100%;
+        --border: 30 20% 88%;
+        --input: 30 20% 88%;
+        --ring: 9 71% 58%;
+        --radius: 0.9rem;
+        --sand: 44 40% 93%;
+    }
+    .dark {
+        --background: 207 25% 9%;
+        --foreground: 210 20% 96%;
+        --card: 208 26% 14%;
+        --card-foreground: 210 20% 96%;
+        --popover: 208 26% 14%;
+        --popover-foreground: 210 20% 96%;
+        --primary: 9 100% 67%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 146 34% 46%;
+        --secondary-foreground: 0 0% 100%;
+        --muted: 208 20% 20%;
+        --muted-foreground: 208 12% 67%;
+        --accent: 38 100% 65%;
+        --accent-foreground: 207 25% 9%;
+        --destructive: 0 62% 45%;
+        --destructive-foreground: 0 0% 100%;
+        --border: 208 20% 22%;
+        --input: 208 20% 22%;
+        --ring: 9 100% 67%;
+        --sand: 208 22% 16%;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+    }
+    h1, h2, h3, h4, .font-heading {
+        font-family: 'Outfit', system-ui, sans-serif;
+    }
+}
+
+::selection {
+    background: hsl(var(--primary) / 0.25);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: hsl(var(--primary) / 0.3); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--primary) / 0.5); }
+
+/* Hide horizontal scrollbar for filter pills */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@keyframes pulseRing {
+    0% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.5); }
+    70% { box-shadow: 0 0 0 12px hsl(var(--primary) / 0); }
+    100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0); }
+}
+
+/* Leaflet marker pin */
+.map-pin {
+    background: transparent;
+    border: none;
+}
+.map-pin-inner {
+    width: 34px; height: 34px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    border: 2px solid white;
+}
+.map-pin-inner svg { transform: rotate(45deg); }
+.leaflet-container { font-family: 'Plus Jakarta Sans', sans-serif; background: hsl(var(--sand)); }

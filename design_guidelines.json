@@ -1,0 +1,172 @@
+{
+  "project_name": "SababaKids - Israel Family Activity Discovery App",
+  "app_type": "hybrid_fullstack",
+  "theme": {
+    "default_mode": "light",
+    "support_toggle": true,
+    "archetype": "ORGANIC_EARTHY_PLAYFUL",
+    "vibe": "Warm Mediterranean sunset, playful yet trustworthy, map-centric, parent-first efficiency"
+  },
+  "colors": {
+    "light": {
+      "primary": "#E05A47",
+      "primary_hover": "#C84937",
+      "primary_light": "#FDF0EE",
+      "secondary": "#3B7A57",
+      "secondary_light": "#EAF3ED",
+      "accent_sun": "#F5A623",
+      "accent_sky": "#38A169",
+      "background": "#FDFBF7",
+      "surface": "#FFFFFF",
+      "surface_subtle": "#F5F2EB",
+      "card_border": "rgba(224, 90, 71, 0.12)",
+      "text_main": "#1C252C",
+      "text_muted": "#5C6A76",
+      "text_light": "#8A99A6",
+      "badge_free": "#2E7D32",
+      "badge_paid": "#D97706",
+      "badge_indoor": "#0284C7",
+      "badge_outdoor": "#15803D"
+    },
+    "dark": {
+      "primary": "#FF6B57",
+      "primary_hover": "#E05A47",
+      "primary_light": "rgba(255, 107, 87, 0.15)",
+      "secondary": "#4E9F70",
+      "secondary_light": "rgba(78, 159, 112, 0.15)",
+      "accent_sun": "#FFB84D",
+      "accent_sky": "#4ADE80",
+      "background": "#12181E",
+      "surface": "#1A232C",
+      "surface_subtle": "#242F3B",
+      "card_border": "rgba(255, 255, 255, 0.1)",
+      "text_main": "#F3F5F7",
+      "text_muted": "#A0ACB7",
+      "text_light": "#6C7A87",
+      "badge_free": "#4ADE80",
+      "badge_paid": "#FBBF24",
+      "badge_indoor": "#38BDF8",
+      "badge_outdoor": "#4ADE80"
+    }
+  },
+  "typography": {
+    "heading_font": "'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif",
+    "body_font": "'Plus Jakarta Sans', 'Inter', system-ui, sans-serif",
+    "mono_font": "'JetBrains Mono', monospace",
+    "scale": {
+      "h1": "text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight",
+      "h2": "text-2xl sm:text-3xl font-bold tracking-tight",
+      "h3": "text-xl sm:text-2xl font-semibold",
+      "h4": "text-lg font-semibold",
+      "body": "text-base leading-relaxed",
+      "body_sm": "text-sm leading-normal",
+      "caption": "text-xs font-medium tracking-wide uppercase"
+    }
+  },
+  "image_urls": {
+    "playgrounds": [
+      {
+        "url": "https://images.unsplash.com/photo-1634608874538-443b84f7b06b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHw0fHxraWRzJTIwcGxheWdyb3VuZCUyMHBhcmslMjBmYW1pbHklMjBhY3Rpdml0eXxlbnwwfHx8fDE3ODg3OTYyNDB8MA&ixlib=rb-4.1.0&q=85",
+        "title": "Park Park Hayarkon Playground - Tel Aviv",
+        "category": "outdoor_park"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1591865527703-ce63c96b984f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHwyfHxraWRzJTIwcGxheWdyb3VuZCUyMHBhcmslMjBmYW1pbHklMjBhY3Rpdml0eXxlbnwwfHx8fDE3ODg3OTYyNDB8MA&ixlib=rb-4.1.0&q=85",
+        "title": "Gan Sacher Adventure Park - Jerusalem",
+        "category": "outdoor_park"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1575783970733-1aaedde1db74?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHwxfHxraWRzJTIwcGxheWdyb3VuZCUyMHBhcmslMjBmYW1pbHklMjBhY3Rpdml0eXxlbnwwfHx8fDE3ODg3OTYyNDB8MA&ixlib=rb-4.1.0&q=85",
+        "title": "Raanana Park Play Zone",
+        "category": "outdoor_park"
+      }
+    ],
+    "beaches": [
+      {
+        "url": "https://images.unsplash.com/photo-1597524678053-5e6fef52d8a3?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2OTV8MHwxfHNlYXJjaHwzfHxmYW1pbHklMjBiZWFjaCUyMHN1bm55fGVufDB8fHx8MTc4NzA4ODI2NXww&ixlib=rb-4.1.0&q=85",
+        "title": "Gordon Beach Family Lagoon - Tel Aviv",
+        "category": "beach"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1721840432289-d0041522103d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2OTV8MHwxfHNlYXJjaHw0fHxmYW1pbHklMjBiZWFjaCUyMHN1bm55fGVufDB8fHx8MTc4NzA4ODI2NXww&ixlib=rb-4.1.0&q=85",
+        "title": "Caesarea Aqueduct Beach",
+        "category": "beach"
+      }
+    ],
+    "museums_indoor": [
+      {
+        "url": "https://images.unsplash.com/photo-1778513599495-6bba02a83e39?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzF8MHwxfHNlYXJjaHxfHxjaGlsZHJlbiUyMHNjaWVuY2UlMjBtdXNldW0lMjBpbmRvb3IlMjBhY3Rpdml0eXxlbnwwfHx8fDE3ODg3OTYyNDl8MA&ixlib=rb-4.1.0&q=85",
+        "title": "Bloomfield Science Museum - Jerusalem",
+        "category": "museum_indoor"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1768154576965-61e5776268a7?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzF8MHwxfHNlYXJjaHwyfHxjaGlsZHJlbiUyMHNjaWVuY2UlMjBtdXNldW0lMjBpbmRvb3IlMjBhY3Rpdml0eXxlbnwwfHx8fDE3ODg3OTYyNDl8MA&ixlib=rb-4.1.0&q=85",
+        "title": "Madatech Science Museum - Haifa",
+        "category": "museum_indoor"
+      }
+    ]
+  },
+  "layout_and_navigation": {
+    "mobile_first": true,
+    "header": {
+      "style": "Glassmorphism with backdrop-blur-md bg-white/80 dark:bg-slate-900/80 sticky top-0 z-40 border-b border-stone-200/50 dark:border-slate-800/50",
+      "left": "Logo with SababaKids icon + Israel Flag indicator + Location selector pill",
+      "right": "Favorites Counter Badge, Language Switcher (EN/FR/HE), Dark Mode Toggle, Profile Avatar"
+    },
+    "main_discovery_modes": [
+      "Map View (Interactive leaflet/mapbox or styled canvas map with custom pin markers)",
+      "List / Grid View (High-density cards with photo preview, distance badge, tags, and quick-favorite button)",
+      "Events Calendar View (One-off events sorted by upcoming weekend/date)"
+    ],
+    "filters_bar": {
+      "quick_pills": [
+        "GPS Radius Slider (1km - 50km)",
+        "Child Age (0-2 baby, 3-5 toddler, 6-9 kid, 10-14 teen)",
+        "Setting (All, Indoor, Outdoor, Covered)",
+        "Price (All, Free, Paid)",
+        "Category (Parks, Museums, Playgrounds, Zoos, Beaches, Water Parks, Indoor Play)"
+      ]
+    },
+    "bottom_nav_mobile": {
+      "visible": "md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-stone-200 dark:border-slate-800 px-4 py-2 flex justify-around items-center",
+      "items": [
+        {"label": "Explore", "icon": "Compass", "data_testid": "nav-explore"},
+        {"label": "Map", "icon": "MapPin", "data_testid": "nav-map"},
+        {"label": "Events", "icon": "Calendar", "data_testid": "nav-events"},
+        {"label": "Saved", "icon": "Heart", "data_testid": "nav-saved"}
+      ]
+    }
+  },
+  "key_components": {
+    "location_search_header": "City/Address autocomplete + 'Use my GPS Location' button + Radius indicator badge",
+    "interactive_map": "Map pins with category icons, cluster counts, pulse animation on active pin, bottom swipeable sheet preview card",
+    "activity_card": "Rounded-2xl card with overflow-hidden image, distance badge, age tag, indoor/outdoor indicator, star rating, free/paid pill, and quick save icon button",
+    "activity_detail_drawer": "Full height slide-over/modal with photo gallery, operating hours, age suitability, stroller accessibility, parking availability, weather recommendation, Google Places link, Waze/Maps direction buttons",
+    "one_off_events_section": "Weekend specials carousel / grid with date badge, time, booking status, and age recommendation",
+    "favorites_manager": "Localstorage backed list with quick export / WhatsApp share list for family trips"
+  },
+  "testing_and_accessibility": {
+    "data_testid_rules": "ALL interactive buttons, search inputs, radius sliders, category pills, card items, map pins, and tabs MUST have explicit kebab-case data-testid attributes.",
+    "examples": [
+      "data-testid='search-location-input'",
+      "data-testid='btn-use-gps'",
+      "data-testid='radius-slider'",
+      "data-testid='filter-age-toddler'",
+      "data-testid='filter-category-park'",
+      "data-testid='filter-type-indoor'",
+      "data-testid='filter-price-free'",
+      "data-testid='activity-card-1'",
+      "data-testid='btn-save-favorite'",
+      "data-testid='toggle-map-list-view'",
+      "data-testid='event-item-card'"
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Ensure the app feels incredibly slick, fast, and parent-friendly with zero setup friction.",
+    "Provide robust mock/fallback data for Google Places and Israeli local events (Tel Aviv, Jerusalem, Haifa, Eilat, Sharon, Galilee) so the map and list are immediately full of rich activities.",
+    "Integrate real GPS geolocation API browser requests with standard Tel Aviv default coordinates fallback.",
+    "Include age filter toggles (0-2, 3-5, 6-9, 10+) and clear Free/Paid and Indoor/Outdoor badges on every card.",
+    "Support dark mode smoothly via Tailwind dark: classes and state toggle.",
+    "Follow responsive mobile-first guidelines with floating action bar on mobile viewports."
+  ]
+}
