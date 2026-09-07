@@ -22,10 +22,12 @@ User lives in Israel and frequently wonders what activities to do with their kid
 - Activity detail drawer with hours, ages, features, Waze/Google Maps directions.
 
 ## Implemented (2026-06)
-- ✅ Backend `/api/places/search` — geocode (city lookup + Google fallback) + Google Places nearby/text search + haversine distance filtering + all filters. Curated Israeli activities always merged as fallback.
-- ✅ Backend `/api/events` — curated events with dynamically computed upcoming dates + distance.
-- ✅ Frontend: Header, FiltersBar (search/GPS/radius/category/age/setting/price), ActivityCard grid, ActivityDetail drawer, Leaflet MapView with category pins, EventsView, Saved/favorites, dark mode, mobile bottom nav.
-- ✅ Tested: 100% backend (12/12 pytest) and 100% frontend (Playwright) on iteration 1.
+- ✅ Backend `/api/places/search` — geocode + Google Places (New) nearby/text + haversine filtering + all filters + curated fallback. **LIVE Google key active** (open_now, photos, ratings).
+- ✅ Backend `/api/events` — combines **live scraped municipal events** (Modi'in board via `events_source.py`, cached 30min) with curated events; parses date/time/GPS/price/age/ticket/.ics; `family_only` filter.
+- ✅ Frontend: Header, FiltersBar, ActivityCard grid, ActivityDetail drawer, Leaflet MapView, EventsView (tickets + add-to-calendar + live source badge + RTL Hebrew), Saved/favorites + WhatsApp share, Open Now badges, dark mode, mobile bottom nav.
+
+## Live Event Sources
+- `events_source.py` — pluggable municipal scrapers. Registered: Modi'in Municipality event board. Add more cities by extending `EVENT_SOURCES` + a parser.
 
 ## Integrations / Keys
 - **Google Maps API key** (`GOOGLE_MAPS_API_KEY` in `/app/backend/.env`) — currently EMPTY. App runs on curated data until the user provides a key (needs Places API New + Geocoding API enabled). When set, live nearby places are merged with curated data.

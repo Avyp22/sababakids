@@ -14,6 +14,7 @@ from zoneinfo import ZoneInfo
 import httpx
 
 from mock_data import CITY_COORDS, ACTIVITIES, EVENTS
+from events_source import EVENT_SOURCES, fetch_source
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -285,22 +286,50 @@ async def search_places(req: SearchRequest):
 
 
 @api_router.get("/events")
-async def get_events(lat: Optional[float] = None, lng: Optional[float] = None, radius_km: float = Query(50, ge=1, le=200)):
-    today = datetime.now(timezone.utc).date()
+async def get_events(
+    lat: Optional[float] = None,
+    lng: Optional[float] = None,
+    radius_km: float = Query(50, ge=1, le=200),
+    family_only: bool = True,
+):
     out = []
+    live_sources = []
+
+    # Pull live municipal event feeds near the search center
+    for src in EVENT_SOURCES:
+        near = True
+        if lat is not None and lng is not None:
+            d = haversine_km(lat, lng, src["center"][0], src["center"][1])
+            near = d <= src["trigger_radius_km"]
+        if near:
+            for ev in fetch_source(src["key"]):
+                item = dict(ev)
+                if lat is not None and lng is not None and item.get("lat") is not None:
+                    item["distance_km"] = round(haversine_km(lat, lng, item["lat"], item["lng"]), 1)
+                out.append(item)
+            live_sources.append(src["name"])
+
+    # Curated fallback events (always available across Israel)
+    today = datetime.now(timezone.utc).date()
     for e in EVENTS:
         ev = dict(e)
         ev_date = today + timedelta(days=ev.pop("day_offset", 0))
         ev["date"] = ev_date.isoformat()
         ev["weekday"] = ev_date.strftime("%A")
+        ev["family"] = True
+        ev["source"] = "SababaKids picks"
         if lat is not None and lng is not None and ev.get("lat") is not None:
             d = haversine_km(lat, lng, ev["lat"], ev["lng"])
-            ev["distance_km"] = round(d, 1)
             if d > radius_km:
                 continue
+            ev["distance_km"] = round(d, 1)
         out.append(ev)
+
+    if family_only:
+        out = [e for e in out if e.get("family", True)]
+
     out.sort(key=lambda x: x["date"])
-    return {"count": len(out), "events": out}
+    return {"count": len(out), "live_sources": live_sources, "events": out}
 
 
 app.include_router(api_router)

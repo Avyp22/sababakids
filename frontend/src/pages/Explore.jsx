@@ -36,6 +36,8 @@ export default function Explore() {
   const [center, setCenter] = useState({ lat: 32.0853, lng: 34.7818, label: "Tel Aviv" });
   const [activities, setActivities] = useState([]);
   const [events, setEvents] = useState([]);
+  const [eventSources, setEventSources] = useState([]);
+  const [familyOnly, setFamilyOnly] = useState(true);
   const [loading, setLoading] = useState(true);
   const [eventsLoading, setEventsLoading] = useState(true);
   const [selected, setSelected] = useState(null);
@@ -70,12 +72,12 @@ export default function Explore() {
   useEffect(() => {
     let active = true;
     setEventsLoading(true);
-    getEvents({ lat: center.lat, lng: center.lng, radius_km: Math.max(radius * 3, 60) })
-      .then((d) => { if (active) setEvents(d.events); })
+    getEvents({ lat: center.lat, lng: center.lng, radius_km: Math.max(radius * 3, 60), family_only: familyOnly })
+      .then((d) => { if (active) { setEvents(d.events); setEventSources(d.live_sources || []); } })
       .catch(() => {})
       .finally(() => { if (active) setEventsLoading(false); });
     return () => { active = false; };
-  }, [center.lat, center.lng]); // eslint-disable-line
+  }, [center.lat, center.lng, familyOnly]); // eslint-disable-line
 
   const handleUseGps = () => {
     if (!navigator.geolocation) return toast.error("Geolocation not supported on this device.");
@@ -192,6 +194,28 @@ export default function Explore() {
             <Button onClick={shareFavorites} className="rounded-xl gap-2 bg-[#25D366] hover:bg-[#1ebe5b] text-white" data-testid="btn-share-whatsapp">
               <Share2 className="w-4 h-4" /> Share on WhatsApp
             </Button>
+          </div>
+        )}
+
+        {tab === "events" && (
+          <div className="mb-4 flex items-center justify-between gap-3 flex-wrap">
+            <div className="text-xs text-muted-foreground flex items-center gap-1.5" data-testid="events-source-note">
+              {eventSources.length > 0 ? (
+                <><span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Live events from {eventSources.join(", ")} + curated picks</>
+              ) : (
+                <>Curated family events near you</>
+              )}
+            </div>
+            <button
+              onClick={() => setFamilyOnly((v) => !v)}
+              data-testid="toggle-family-only"
+              className={cn(
+                "px-3 h-8 rounded-full text-xs font-semibold border transition-colors",
+                familyOnly ? "bg-secondary text-secondary-foreground border-secondary" : "bg-background border-border text-muted-foreground"
+              )}
+            >
+              {familyOnly ? "👨‍👩‍👧 Family events only" : "Showing all events"}
+            </button>
           </div>
         )}
 
