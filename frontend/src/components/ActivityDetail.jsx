@@ -6,7 +6,7 @@ import {
   Heart, Star, MapPin, Clock, Navigation, ExternalLink, Check,
 } from "lucide-react";
 import { CATEGORY_MAP } from "@/lib/categories";
-import { SettingBadge, PriceBadge } from "@/components/ActivityCard";
+import { SettingBadge, PriceBadge, OpenNowBadge } from "@/components/ActivityCard";
 import { cn } from "@/lib/utils";
 
 const FEATURE_LABELS = {
@@ -57,7 +57,13 @@ export function ActivityDetail({ activity, open, onClose, isFavorite, onToggleFa
         data-testid="activity-detail-drawer"
       >
         <div className="relative aspect-[16/11] bg-muted">
-          <img src={activity.image} alt={activity.name} className="w-full h-full object-cover" />
+          {activity.image ? (
+            <img src={activity.image} alt={activity.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${cat.color}22, ${cat.color}66)` }}>
+              <Icon className="w-14 h-14" style={{ color: cat.color }} />
+            </div>
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           <div className="absolute bottom-4 left-4 right-4">
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 text-xs font-bold w-fit mb-2" style={{ color: cat.color }}>
@@ -93,6 +99,7 @@ export function ActivityDetail({ activity, open, onClose, isFavorite, onToggleFa
             )}
             <SettingBadge setting={activity.setting} />
             <PriceBadge price={activity.price} />
+            <OpenNowBadge openNow={activity.open_now} />
             {typeof activity.distance_km === "number" && (
               <span className="flex items-center gap-1 text-xs font-semibold text-muted-foreground">
                 <Navigation className="w-3.5 h-3.5" /> {activity.distance_km} km away

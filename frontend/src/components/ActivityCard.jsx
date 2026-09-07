@@ -1,4 +1,4 @@
-import { Heart, Star, MapPin, Navigation, Home, Sun } from "lucide-react";
+import { Heart, Star, MapPin, Navigation, Home, Sun, Clock } from "lucide-react";
 import { CATEGORY_MAP } from "@/lib/categories";
 import { cn } from "@/lib/utils";
 
@@ -15,12 +15,19 @@ export function ActivityCard({ activity, index, isFavorite, onToggleFavorite, on
       style={{ animationDelay: `${Math.min(index, 12) * 45}ms` }}
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-muted">
-        <img
-          src={activity.image}
-          alt={activity.name}
-          loading="lazy"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
+        {activity.image ? (
+          <img
+            src={activity.image}
+            alt={activity.name}
+            loading="lazy"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => { e.currentTarget.style.display = "none"; }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${cat.color}22, ${cat.color}55)` }}>
+            <Icon className="w-10 h-10" style={{ color: cat.color }} />
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
 
         <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur text-xs font-bold" style={{ color: cat.color }}>
@@ -36,12 +43,15 @@ export function ActivityCard({ activity, index, isFavorite, onToggleFavorite, on
           <Heart className={cn("w-4.5 h-4.5 transition-colors", fav ? "fill-primary text-primary" : "text-slate-600")} />
         </button>
 
-        {typeof activity.distance_km === "number" && (
-          <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/55 backdrop-blur text-white text-xs font-semibold">
-            <Navigation className="w-3 h-3" />
-            {activity.distance_km} km
-          </div>
-        )}
+        <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
+          {typeof activity.distance_km === "number" && (
+            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/55 backdrop-blur text-white text-xs font-semibold">
+              <Navigation className="w-3 h-3" />
+              {activity.distance_km} km
+            </div>
+          )}
+          <OpenNowBadge openNow={activity.open_now} />
+        </div>
       </div>
 
       <div className="p-4 flex flex-col flex-1">
@@ -104,5 +114,21 @@ export function PriceBadge({ price }) {
     >
       {free ? "FREE" : "PAID"}
     </span>
+  );
+}
+
+export function OpenNowBadge({ openNow }) {
+  if (openNow === null || openNow === undefined) return null;
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-1 px-2.5 py-1 rounded-full backdrop-blur text-white text-xs font-semibold",
+        openNow ? "bg-emerald-600/90" : "bg-slate-600/90"
+      )}
+      data-testid="open-now-badge"
+    >
+      <Clock className="w-3 h-3" />
+      {openNow ? "Open now" : "Closed"}
+    </div>
   );
 }

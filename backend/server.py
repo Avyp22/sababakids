@@ -3,12 +3,14 @@ from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
+import re
 import math
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import datetime, timezone, timedelta
+from zoneinfo import ZoneInfo
 import httpx
 
 from mock_data import CITY_COORDS, ACTIVITIES, EVENTS
@@ -36,6 +38,25 @@ def haversine_km(lat1, lng1, lat2, lng2):
     dlng = math.radians(lng2 - lng1)
     a = math.sin(dlat / 2) ** 2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlng / 2) ** 2
     return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+
+def compute_open_now(hours):
+    """Best-effort open-now for curated free-text hours (Israel time)."""
+    if not hours:
+        return None
+    h = hours.lower()
+    if "24" in h:
+        return True
+    now = datetime.now(ZoneInfo("Asia/Jerusalem"))
+    minutes = now.hour * 60 + now.minute
+    if "daylight" in h:
+        return 6 * 60 <= minutes <= 19 * 60
+    m = re.search(r"(\d{1,2}):(\d{2})\s*[-\u2013]\s*(\d{1,2}):(\d{2})", hours)
+    if not m:
+        return None
+    start = int(m.group(1)) * 60 + int(m.group(2))
+    end = int(m.group(3)) * 60 + int(m.group(4))
+    return start <= minutes <= end
 
 
 CATEGORY_TO_GOOGLE = {
@@ -119,7 +140,8 @@ async def google_places(category, lat, lng, radius_m):
     mask = (
         "places.id,places.displayName,places.formattedAddress,places.location,"
         "places.primaryType,places.types,places.photos,places.rating,"
-        "places.userRatingCount,places.googleMapsUri,places.goodForChildren"
+        "places.userRatingCount,places.googleMapsUri,places.goodForChildren,"
+        "places.currentOpeningHours,places.regularOpeningHours"
     )
     headers = {
         "X-Goog-Api-Key": GOOGLE_KEY,
@@ -161,6 +183,9 @@ async def google_places(category, lat, lng, radius_m):
             name = p["photos"][0].get("name")
             if name:
                 photo = f"https://places.googleapis.com/v1/{name}/media?maxWidthPx=800&key={GOOGLE_KEY}"
+        oh = p.get("currentOpeningHours") or p.get("regularOpeningHours") or {}
+        open_now = oh.get("openNow")
+        hours_text = "; ".join(oh.get("weekdayDescriptions", [])[:1]) or "See Google Maps for hours"
         out.append({
             "id": p.get("id"),
             "name": p.get("displayName", {}).get("text", "Unnamed place"),
@@ -176,7 +201,8 @@ async def google_places(category, lat, lng, radius_m):
             "ages": ["0-2", "3-5", "6-9", "10+"],
             "setting": "indoor" if cat in INDOOR_CATEGORIES else "outdoor",
             "price": None,
-            "hours": "See Google Maps for hours",
+            "hours": hours_text,
+            "open_now": open_now,
             "features": ["good_for_children"] if p.get("goodForChildren") else [],
             "google_maps_uri": p.get("googleMapsUri"),
             "source": "google",
@@ -235,6 +261,8 @@ async def search_places(req: SearchRequest):
         seen.add(key)
         item = dict(a)
         item["distance_km"] = round(dist, 1)
+        if item.get("open_now") is None:
+            item["open_now"] = compute_open_now(item.get("hours"))
         final.append(item)
 
     final.sort(key=lambda x: x["distance_km"])

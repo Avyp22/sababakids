@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { toast } from "sonner";
-import { LayoutGrid, Map as MapIcon, Calendar, Heart, Compass, SearchX, Loader2 } from "lucide-react";
+import { LayoutGrid, Map as MapIcon, Calendar, Heart, Compass, SearchX, Loader2, Share2 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { FiltersBar } from "@/components/FiltersBar";
 import { ActivityCard } from "@/components/ActivityCard";
@@ -9,6 +9,7 @@ import { MapView } from "@/components/MapView";
 import { EventsView } from "@/components/EventsView";
 import { searchActivities, getEvents } from "@/lib/api";
 import { useFavorites, useTheme } from "@/lib/store";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const TABS = [
@@ -101,6 +102,17 @@ export default function Explore() {
 
   const openDetail = (a) => { setSelected(a); setDetailOpen(true); };
 
+  const shareFavorites = () => {
+    if (!favorites.length) return;
+    const lines = favorites.map((a, i) => {
+      const maps = a.google_maps_uri || `https://www.google.com/maps/search/?api=1&query=${a.lat},${a.lng}`;
+      return `${i + 1}. ${a.name} (${a.city || a.address})\n   ${maps}`;
+    });
+    const text = `👨‍👩‍👧‍👦 Our SababaKids family activity list:\n\n${lines.join("\n\n")}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+    toast.success("Opening WhatsApp to share your list");
+  };
+
   const savedList = useMemo(() => favorites, [favorites]);
   const gridData = tab === "saved" ? savedList : activities;
 
@@ -169,6 +181,17 @@ export default function Explore() {
         {googleEnabled === false && tab !== "events" && (
           <div className="mb-4 text-xs text-muted-foreground bg-accent/10 border border-accent/20 rounded-xl px-3 py-2" data-testid="google-notice">
             Showing curated Israeli activities. Add a Google Maps API key to include live nearby places.
+          </div>
+        )}
+
+        {tab === "saved" && savedList.length > 0 && (
+          <div className="mb-4 flex items-center justify-between gap-3 bg-secondary/10 border border-secondary/20 rounded-2xl px-4 py-3">
+            <p className="text-sm font-medium text-foreground/80">
+              Plan your outing — share this list with the family.
+            </p>
+            <Button onClick={shareFavorites} className="rounded-xl gap-2 bg-[#25D366] hover:bg-[#1ebe5b] text-white" data-testid="btn-share-whatsapp">
+              <Share2 className="w-4 h-4" /> Share on WhatsApp
+            </Button>
           </div>
         )}
 
