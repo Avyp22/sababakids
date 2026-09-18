@@ -27,7 +27,12 @@ User lives in Israel and frequently wonders what activities to do with their kid
 - ✅ Frontend: Header, FiltersBar, ActivityCard grid, ActivityDetail drawer, Leaflet MapView, EventsView (tickets + add-to-calendar + live source badge + RTL Hebrew), Saved/favorites + WhatsApp share, Open Now badges, dark mode, mobile bottom nav.
 
 ## Live Event Sources
-- `events_source.py` — pluggable municipal scrapers. Registered: Modi'in Municipality event board. Add more cities by extending `EVENT_SOURCES` + a parser.
+- `events_source.py` — pluggable event connectors:
+  - **Modi'in Municipality** board (`_parse_modiin`) — municipal, proximity-gated, respects user radius.
+  - **Leaan (national aggregator)** (`fetch_leaan`) — parses leaan.co.il embedded Next.js JSON (~340 future ticketed events) covering ALL major cities incl. Jerusalem/Tel Aviv/Haifa; Hebrew city→coords via `HEB_CITY_COORDS`; distance-filtered by user radius.
+  - Curated SababaKids picks as fallback. `family_only` filter (default OFF = show all). 30-min in-process cache.
+- Add more municipalities by extending `EVENT_SOURCES` + a parser.
+- Tested iteration 2: 100% backend (18/18) + frontend. Fixed: municipal events now respect user radius_km.
 
 ## Integrations / Keys
 - **Google Maps API key** (`GOOGLE_MAPS_API_KEY` in `/app/backend/.env`) — currently EMPTY. App runs on curated data until the user provides a key (needs Places API New + Geocoding API enabled). When set, live nearby places are merged with curated data.

@@ -1,0 +1,34 @@
+{
+  "summary": "Tested expanded /api/events (national Leaan aggregator + Modi'in municipal + curated). 18/18 pytest backend tests pass. Frontend Events tab validated: source banner reads 'Live events from Modi'in Municipality, Leaan (national) + curated picks'; 314 upcoming events near Tel Aviv (all sources), family_only toggle reduces to 118 and toggle label updates; event cards render Hebrew text with dir=auto, 304 Tickets buttons and 18 Calendar buttons (Modi'in only). City search (Haifa) + Events tab refreshed events list. Regression: /places/search returns google_enabled=true with live Google Places results near Tel Aviv (121 activities).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/events", "issue": "FIXED during this run: municipal (Modi'in) events were emitted for any user within trigger_radius_km(35) of Modi'in but never filtered against the caller's radius_km, so a search with radius_km=3 near Tel Aviv still returned Modi'in events ~29km away. Added distance check that skips municipal events beyond radius_km (server.py /api/events)."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/test_events_expanded.py", "/app/backend/tests/test_sababakids_api.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "None blocking. Consider adding an ages badge / kid-friendly indicator on Leaan cards (national aggregator returns ages=[] so most non-kids-section events lose age info)."
+  ],
+  "critical_code_review_comments": [
+    "events_source.fetch_leaan(): if the leaan HTML no longer contains __NEXT_DATA__ (site refactor), `m.group(1)` will raise AttributeError inside the try, currently caught -- fine, but consider explicit `if not m` check for clearer logging.",
+    "server.py /api/events previously did not filter municipal events by user radius_km; fixed. Consider also filtering curated EVENTS by trigger only when needed to avoid always injecting national picks.",
+    "test_sababakids_api.py test_root previously asserted google_enabled is False; updated to True to match GOOGLE_MAPS_API_KEY being set in this environment.",
+    "@app.on_event('shutdown') still deprecated - migrate to lifespan (carried over from iteration 1)."
+  ],
+  "updated_files": [
+    "/app/backend/server.py (municipal events now respect radius_km)",
+    "/app/backend/tests/test_sababakids_api.py (google_enabled assertion updated)",
+    "/app/backend/tests/test_events_expanded.py (new: 6 tests for national+municipal+family_only+distance+regression)"
+  ],
+  "success_rate": {"backend": "100% (18/18)", "frontend": "100% (all critical flows verified)"},
+  "seed_data_creation": "None - uses live leaan.co.il + modiin.muni.il data with 30-min in-process cache.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Events endpoint now merges 3 streams (municipal Modi'in, national Leaan aggregator via __NEXT_DATA__, curated) and correctly honours user radius_km. GOOGLE_MAPS_API_KEY is live in this env so /api/ returns google_enabled=true and /places/search returns real Google Places results. Data is largely Hebrew by design."
+}

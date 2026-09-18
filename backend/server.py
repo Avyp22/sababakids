@@ -305,7 +305,10 @@ async def get_events(
             for ev in fetch_source(src["key"]):
                 item = dict(ev)
                 if lat is not None and lng is not None and item.get("lat") is not None:
-                    item["distance_km"] = round(haversine_km(lat, lng, item["lat"], item["lng"]), 1)
+                    d = haversine_km(lat, lng, item["lat"], item["lng"])
+                    if d > radius_km:
+                        continue
+                    item["distance_km"] = round(d, 1)
                 out.append(item)
             live_sources.append(src["name"])
 
