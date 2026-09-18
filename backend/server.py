@@ -14,7 +14,7 @@ from zoneinfo import ZoneInfo
 import httpx
 
 from mock_data import CITY_COORDS, ACTIVITIES, EVENTS
-from events_source import EVENT_SOURCES, fetch_source
+from events_source import EVENT_SOURCES, fetch_source, fetch_leaan
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -290,7 +290,7 @@ async def get_events(
     lat: Optional[float] = None,
     lng: Optional[float] = None,
     radius_km: float = Query(50, ge=1, le=200),
-    family_only: bool = True,
+    family_only: bool = False,
 ):
     out = []
     live_sources = []
@@ -308,6 +308,23 @@ async def get_events(
                     item["distance_km"] = round(haversine_km(lat, lng, item["lat"], item["lng"]), 1)
                 out.append(item)
             live_sources.append(src["name"])
+
+    # National aggregator (covers all major cities incl. Jerusalem/Tel Aviv/Haifa)
+    national = fetch_leaan()
+    added_national = False
+    for ev in national:
+        item = dict(ev)
+        if lat is not None and lng is not None:
+            if item.get("lat") is None:
+                continue  # skip events we can't place near the user
+            d = haversine_km(lat, lng, item["lat"], item["lng"])
+            if d > radius_km:
+                continue
+            item["distance_km"] = round(d, 1)
+        out.append(item)
+        added_national = True
+    if added_national:
+        live_sources.append("Leaan (national)")
 
     # Curated fallback events (always available across Israel)
     today = datetime.now(timezone.utc).date()

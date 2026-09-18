@@ -37,7 +37,7 @@ export default function Explore() {
   const [activities, setActivities] = useState([]);
   const [events, setEvents] = useState([]);
   const [eventSources, setEventSources] = useState([]);
-  const [familyOnly, setFamilyOnly] = useState(true);
+  const [familyOnly, setFamilyOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [eventsLoading, setEventsLoading] = useState(true);
   const [selected, setSelected] = useState(null);
