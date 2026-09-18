@@ -1,0 +1,19 @@
+# Netlify configuration — deploys the SababaKids React frontend.
+# NOTE: The FastAPI backend + MongoDB are NOT hosted by Netlify.
+# Host the backend separately (Emergent Deploy / Render / Railway / Fly.io)
+# and set REACT_APP_BACKEND_URL in Netlify → Site settings → Environment variables.
+
+[build]
+  base = "frontend"
+  command = "yarn build"
+  publish = "build"
+
+[build.environment]
+  NODE_VERSION = "20"
+  CI = "false"
+
+# SPA fallback so client-side routes resolve to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
