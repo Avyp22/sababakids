@@ -1,6 +1,6 @@
 import {
   Sparkles, TreePine, Blocks, Landmark, PawPrint, Waves,
-  Baby, FerrisWheel, Fish, Ticket, PartyPopper, GraduationCap,
+  Baby, FerrisWheel, Fish, Ticket, PartyPopper, GraduationCap, Droplets,
 } from "lucide-react";
 
 export const CATEGORIES = [
@@ -8,6 +8,7 @@ export const CATEGORIES = [
   { id: "park", label: "Parks", icon: TreePine, color: "#15803D" },
   { id: "playground", label: "Playgrounds", icon: Blocks, color: "#F5A623" },
   { id: "beach", label: "Beaches", icon: Waves, color: "#0284C7" },
+  { id: "nature", label: "Nature & springs", icon: Droplets, color: "#059669" },
   { id: "museum", label: "Museums", icon: Landmark, color: "#7C3AED" },
   { id: "zoo", label: "Zoos", icon: PawPrint, color: "#B45309" },
   { id: "aquarium", label: "Aquariums", icon: Fish, color: "#0891B2" },

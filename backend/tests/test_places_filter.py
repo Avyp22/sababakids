@@ -38,3 +38,16 @@ def test_cemetery_by_name_is_excluded():
 
 def test_blocklisted_id_is_excluded():
     assert _is_excluded({"id": "ChIJ6x8sJ_e7HRURYmDH38A6sIA", "primaryType": "park", "types": ["park"]})
+
+
+def test_spring_is_nature():
+    p = {"primaryType": "park", "types": ["park"], "displayName": {"text": "עין שיח"}}
+    assert _category_for(p, "park") == "nature"
+    p = {"primaryType": "park", "types": ["park"], "displayName": {"text": "Ein Kerem Spring"}}
+    assert _category_for(p, "park") == "nature"
+
+
+def test_park_named_like_town_stays_park():
+    # "Ein" inside a word must not trigger; museums are never reclassified
+    assert _category_for({"primaryType": "park", "types": ["park"], "displayName": {"text": "Gan Meir Park"}}, "park") == "park"
+    assert _category_for({"primaryType": "museum", "types": ["museum"], "displayName": {"text": "מוזיאון עין הוד"}}, "museum") == "museum"

@@ -344,55 +344,129 @@ def fetch_holon():
 
 # ---------- Haifa ----------
 
-def _parse_haifa(html, family_ids=frozenset()):
+# One entry inside a community-centre page, e.g.
+# "יום שני 12.10.2026 בשעה 17:30 | מופע מוסיקלי בוקה בוקה | מתנ"ס רמות ספיר | 20 ₪ <description>"
+_HAIFA_SUB_RE = re.compile(
+    r"(\d{1,2})\.(\d{1,2})\.(\d{4})\s*בשעה\s*(\d{1,2}:\d{2})\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*"
+    r"(.*?)(?=(?:יום \S+\s+)?\d{1,2}\.\d{1,2}\.\d{4}\s*בשעה|ימי |חודש |לפרטים נוספים|$)")
+_PRICE_RE = re.compile(r"^(?:עלות:?\s*)?(\d+\s*₪|ללא עלות|חינם)\s*")
+
+
+def _haifa_items(html):
+    """Listing cards -> dicts (one per card; the same event can appear per date)."""
     soup = BeautifulSoup(html, "lxml")
-    today = datetime.now(TZ).date()
-    center = EVENT_SOURCES[2]["center"]
-    events = []
+    items = []
     for item in soup.select("div.place-archive-item"):
-        inner = item.select_one(".is-event-archive-item")
         link = item.find("a", href=True)
         title_el = item.select_one(".place-title")
         date_el = item.select_one(".place-phone")
-        if not (inner and link and title_el and date_el):
+        if not (link and title_el and date_el):
             continue
-        name = title_el.get_text(" ", strip=True)
-        dates = re.findall(r"\d{1,2}/\d{1,2}/\d{4}", date_el.get_text(" ", strip=True))
+        date_text = date_el.get_text(" ", strip=True)
+        dates = re.findall(r"\d{1,2}/\d{1,2}/\d{4}", date_text)
         start = _parse_ddmmyy(dates[0]) if dates else None
         if not start:
             continue
-        end = _parse_ddmmyy(dates[1]) if len(dates) > 1 else start
-        span = _clip_dates(start, end, today)
-        if not span:
-            continue
-        eid = item.get("data-id") or link["href"]
+        tm = re.search(r"\d{1,2}:\d{2}", date_text)
         addr_el = item.select_one(".place-address")
-        venue = addr_el.get_text(" ", strip=True) if addr_el else ""
         img = item.select_one("img.wp-post-image")
-        free = item.select_one(".is-free-event") is not None
-        ages = _map_ages(name)
-        fam = str(eid) in family_ids or (not family_ids and is_family(name, ages))
-        if _has(name, ADULT_KEYWORDS):
-            fam = False
+        items.append({
+            "eid": str(item.get("data-id") or link["href"]),
+            "url": link["href"],
+            "name": title_el.get_text(" ", strip=True),
+            "start": start,
+            "end": _parse_ddmmyy(dates[1]) if len(dates) > 1 else start,
+            "time": tm.group(0) if tm else "",
+            "venue": addr_el.get_text(" ", strip=True) if addr_el else "",
+            "image": img["src"] if img and img.get("src") else None,
+            "free": item.select_one(".is-free-event") is not None,
+        })
+    return items
+
+
+def _haifa_sub_events(item, today):
+    """Community centres publish one 2-month card whose page lists the real events."""
+    soup = BeautifulSoup(_get(item["url"]), "lxml")
+    main = soup.select_one("main") or soup.body
+    text = re.sub(r"\s+", " ", main.get_text(" ", strip=True))
+    cut = text.find("אירועים נוספים")
+    text = text[:cut] if cut > 0 else text
+    center = EVENT_SOURCES[2]["center"]
+    events = []
+    for m in _HAIFA_SUB_RE.finditer(text):
+        try:
+            d = date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+        except ValueError:
+            continue
+        if d < today:
+            continue
+        name, venue, rest = m.group(5).strip(), m.group(6).strip(), m.group(7).strip()
+        pm = _PRICE_RE.match(rest)
+        price_raw = pm.group(1) if pm else ""
+        description = rest[pm.end():] if pm else rest
+        blob = f"{name} {description}"
+        ages = _map_ages(blob)
+        price = "free" if price_raw in ("ללא עלות", "חינם") else ("paid" if "₪" in price_raw else _detect_price(blob))
         events.append(_base_event(
-            id=f"haifa-{eid}", name=name, category=_detect_category(name),
-            venue=venue, city="חיפה", address=venue, lat=center[0], lng=center[1],
-            image=img["src"] if img and img.get("src") else None,
-            date=span[0].isoformat(), end_date=span[1].isoformat() if span[1] != span[0] else None,
-            price="free" if free else None, ages=ages, family=fam,
-            description=venue, ticket_url=link["href"], source="Haifa Municipality",
+            id=f"haifa-{item['eid']}-{d.isoformat()}-{m.group(4)}", name=name,
+            category=_detect_category(blob), venue=venue or item["venue"], city="חיפה",
+            address=item["venue"], lat=center[0], lng=center[1], image=item["image"],
+            time=m.group(4), date=d.isoformat(), price=price,
+            price_text=price_raw if "₪" in price_raw else None, ages=ages,
+            family=is_family(blob, ages), description=description[:400],
+            ticket_url=item["url"], source="Haifa Municipality",
         ))
     return events
 
 
 def fetch_haifa():
+    today = datetime.now(TZ).date()
+    center = EVENT_SOURCES[2]["center"]
+    items = _haifa_items(_get(HAIFA_URL))
     family_ids = set()
     try:
-        fam_soup = BeautifulSoup(_get(HAIFA_FAMILY_URL), "lxml")
-        family_ids = {str(i.get("data-id")) for i in fam_soup.select("div.place-archive-item") if i.get("data-id")}
+        family_items = _haifa_items(_get(HAIFA_FAMILY_URL))
+        family_ids = {i["eid"] for i in family_items}
+        items += family_items  # the general page doesn't list every kids event
     except Exception as e:
         logger.warning(f"Haifa family page failed: {e}")
-    return _parse_haifa(_get(HAIFA_URL), frozenset(family_ids))
+
+    events, seen, long_items = [], set(), {}
+    for it in items:
+        key = (it["eid"], it["start"], it["time"])
+        if key in seen:
+            continue
+        seen.add(key)
+        if (it["end"] - it["start"]).days > MAX_EVENT_SPAN_DAYS:
+            long_items[it["eid"]] = it  # community-centre programme: expand below
+            continue
+        span = _clip_dates(it["start"], it["end"], today)
+        if not span:
+            continue
+        ages = _map_ages(it["name"])
+        fam = it["eid"] in family_ids or is_family(it["name"], ages)
+        if _has(it["name"], ADULT_KEYWORDS) and not _has(it["name"], ["ילדים", "לילדים"]):
+            fam = False
+        events.append(_base_event(
+            id=f"haifa-{it['eid']}-{span[0].isoformat()}-{it['time']}", name=it["name"],
+            category=_detect_category(it["name"]), venue=it["venue"], city="חיפה", address=it["venue"],
+            lat=center[0], lng=center[1], image=it["image"], time=it["time"],
+            date=span[0].isoformat(), end_date=span[1].isoformat() if span[1] != span[0] else None,
+            price="free" if it["free"] else None, ages=ages, family=fam,
+            description=it["venue"], ticket_url=it["url"], source="Haifa Municipality",
+        ))
+
+    def expand(it):
+        try:
+            return _haifa_sub_events(it, today)
+        except Exception as e:
+            logger.warning(f"Haifa sub-page failed ({it['name']}): {e}")
+            return []
+
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        for sub in pool.map(expand, long_items.values()):
+            events.extend(sub)
+    return events
 
 
 # ---------- Leaan (national) ----------

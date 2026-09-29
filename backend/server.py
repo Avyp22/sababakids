@@ -75,6 +75,7 @@ CATEGORY_TO_GOOGLE = {
     "beach": ("text", "beach"),
     "water_park": ("text", "water park"),
     "indoor_play": ("text", "indoor playground for kids"),
+    "nature": ("text", "מעיין"),
 }
 
 # "All" search: 4 Google calls instead of 9, by grouping Nearby types together.
@@ -89,7 +90,14 @@ GOOGLE_TYPE_TO_CATEGORY = {
     "park": "park", "playground": "playground", "museum": "museum",
     "zoo": "zoo", "amusement_park": "amusement_park", "aquarium": "aquarium",
     "water_park": "water_park", "beach": "beach",
+    "national_park": "nature", "hiking_area": "nature", "state_park": "nature",
 }
+
+# Springs, streams and reserves: Google files most of them as plain "park".
+NATURE_NAME_RE = re.compile(
+    r"(^|\s)(עין|עיינות|מעיין|מעיינות|נחל|שמורת|בריכת|ברכת)\s|\bsprings?\b|\bnature reserve\b|\bwadi\b|\bstream\b",
+    re.IGNORECASE)
+NATURE_OVERRIDABLE = {"park", "playground", "beach"}
 
 # The field mask drives Google's price tier. "rich" (default) keeps rating +
 # opening hours; "basic" drops them for a cheaper tier with a larger free quota.
@@ -223,6 +231,10 @@ def _is_excluded(p):
 
 def _category_for(p, fallback):
     primary = p.get("primaryType")
+    name = p.get("displayName", {}).get("text", "")
+    if NATURE_NAME_RE.search(f"{name} ") and (primary in NATURE_OVERRIDABLE or primary is None
+                                             or primary in ("natural_feature", "tourist_attraction")):
+        return "nature"
     if primary in GOOGLE_TYPE_TO_CATEGORY:
         return GOOGLE_TYPE_TO_CATEGORY[primary]
     for t in p.get("types", []):

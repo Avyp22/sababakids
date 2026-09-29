@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import { CATEGORY_MAP } from "@/lib/categories";
 
 const CATEGORY_EMOJI = {
-  park: "🌳", playground: "🛝", beach: "🏖️", museum: "🏛️", zoo: "🦁",
+  park: "🌳", playground: "🛝", beach: "🏖️", nature: "💧", museum: "🏛️", zoo: "🦁",
   aquarium: "🐠", water_park: "💦", amusement_park: "🎡", indoor_play: "🧸",
 };
 
