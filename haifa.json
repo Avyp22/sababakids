@@ -1,6 +1,6 @@
 {
  "source": "haifa",
- "generated_at": "2026-09-29T17:37:42.414762+03:00",
+ "generated_at": "2026-09-29T22:59:44.675781+03:00",
  "events": [
   {
    "id": "haifa-1032826",
@@ -26,29 +26,6 @@
    "rtl": true
   },
   {
-   "id": "haifa-815370",
-   "name": "יריד וינטאג' ואספנות",
-   "category": "festival",
-   "venue": "שוק הפשפשים",
-   "city": "חיפה",
-   "address": "שוק הפשפשים",
-   "lat": 32.794,
-   "lng": 34.9896,
-   "image": "https://www.haifa.muni.il/wp-content/uploads/2025/03/יריד-וינטאג-361x227.jpg",
-   "time": "",
-   "date": "2026-09-29",
-   "end_date": "2026-10-01",
-   "price": "free",
-   "price_text": null,
-   "ages": [],
-   "family": false,
-   "description": "שוק הפשפשים",
-   "ticket_url": "https://www.haifa.muni.il/event/%d7%99%d7%a8%d7%99%d7%93-%d7%95%d7%99%d7%a0%d7%98%d7%90%d7%92-%d7%95%d7%90%d7%a1%d7%a4%d7%a0%d7%95%d7%aa/",
-   "ics_url": null,
-   "source": "Haifa Municipality",
-   "rtl": true
-  },
-  {
    "id": "haifa-1035203",
    "name": "קמפינג עירוני",
    "category": "festival",
@@ -67,6 +44,29 @@
    "family": true,
    "description": "גלי חיפה",
    "ticket_url": "https://www.haifa.muni.il/event/urban-camping/",
+   "ics_url": null,
+   "source": "Haifa Municipality",
+   "rtl": true
+  },
+  {
+   "id": "haifa-815370",
+   "name": "יריד וינטאג' ואספנות",
+   "category": "festival",
+   "venue": "שוק הפשפשים",
+   "city": "חיפה",
+   "address": "שוק הפשפשים",
+   "lat": 32.794,
+   "lng": 34.9896,
+   "image": "https://www.haifa.muni.il/wp-content/uploads/2025/03/יריד-וינטאג-361x227.jpg",
+   "time": "",
+   "date": "2026-09-29",
+   "end_date": "2026-10-01",
+   "price": "free",
+   "price_text": null,
+   "ages": [],
+   "family": false,
+   "description": "שוק הפשפשים",
+   "ticket_url": "https://www.haifa.muni.il/event/%d7%99%d7%a8%d7%99%d7%93-%d7%95%d7%99%d7%a0%d7%98%d7%90%d7%92-%d7%95%d7%90%d7%a1%d7%a4%d7%a0%d7%95%d7%aa/",
    "ics_url": null,
    "source": "Haifa Municipality",
    "rtl": true
