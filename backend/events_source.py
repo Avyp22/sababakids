@@ -458,6 +458,8 @@ def _haifa_sub_events(item, today):
         if d is None or d < today or len(parts) < 2 or not parts[0]:
             continue
         name, venue, rest = parts[0], parts[1], " | ".join(parts[2:]).strip()
+        if any(e["name"] == name and e["date"] == d.isoformat() and e["time"] == m.group(4) for e in events):
+            continue  # some pages list the same entry twice
         pm = _PRICE_RE.match(rest)
         price_raw = pm.group(1) if pm else ""
         description = rest[pm.end():] if pm else rest
