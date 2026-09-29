@@ -67,7 +67,40 @@ HEB_CITY_COORDS = {
     "קרית גת": (31.6100, 34.7642), "קרית שמונה": (33.2073, 35.5697),
     "צפת": (32.9646, 35.4960), "שוהם": (31.9990, 34.9450),
     "נס ציונה": (31.9293, 34.7987), "אלעד": (32.0520, 34.9510),
+    "גבעת ברנר": (31.8636, 34.8030), "פרדס חנה": (32.4740, 34.9700),
+    "פרדס חנה כרכור": (32.4740, 34.9700), "גלילות": (32.1450, 34.8080),
+    "מעלות תרשיחא": (33.0167, 35.2717), "מעלו תרשיחא": (33.0167, 35.2717),
+    "נוף הגליל": (32.7090, 35.3250), "נווה ירק": (32.1560, 34.9360),
+    "ראש פינה": (32.9690, 35.5420), "קרית אונו": (32.0630, 34.8550),
+    "אריאל": (32.1060, 35.1870), "קיבוץ כנרת": (32.7230, 35.5630),
+    "כנרת": (32.7230, 35.5630), "קיבוץ יגור": (32.7430, 35.0770), "יגור": (32.7430, 35.0770),
+    "נתיבות": (31.4230, 34.5890), "איירפורט סיטי": (32.0000, 34.8930),
+    "יקנעם": (32.6590, 35.1050), "יקנעם עילית": (32.6590, 35.1050),
+    "מעלה אדומים": (31.7770, 35.2980), "אופקים": (31.3140, 34.6200),
+    "שדרות": (31.5250, 34.5960), "קרית ים": (32.8490, 35.0690),
+    "טירת כרמל": (32.7610, 34.9710), "נשר": (32.7720, 35.0400),
+    "עתלית": (32.6890, 34.9410), "בנימינה": (32.5210, 34.9450),
+    "קרית טבעון": (32.7160, 35.1270), "מגדל העמק": (32.6760, 35.2400),
+    "בית שאן": (32.4970, 35.4980), "ערד": (31.2590, 35.2130),
+    "מצפה רמון": (30.6100, 34.8010), "קרית מלאכי": (31.7310, 34.7460),
+    "גדרה": (31.8130, 34.7780), "מזכרת בתיה": (31.8530, 34.8430),
+    "באר יעקב": (31.9420, 34.8350), "אור יהודה": (32.0290, 34.8540),
+    "טייבה": (32.2660, 35.0100), "אום אל פחם": (32.5170, 35.1520),
+    "כפר קאסם": (32.1140, 34.9770), "סחנין": (32.8640, 35.2980),
+    "אשדות יעקב": (32.6600, 35.5800), "עין גב": (32.7820, 35.6400),
 }
+
+
+def city_coords(city):
+    """Coordinates for a Hebrew city name, tolerant of spelling variants
+    ("קריית"/"קרית", "תל אביב - יפו", "קיבוץ X")."""
+    if not city:
+        return None
+    c = re.sub(r"\s*-\s*", "-", city.strip()).replace("קריית", "קרית").replace("״", '"')
+    for cand in (c, c.replace("-", " "), c.split("-")[0].strip(), c.replace("קיבוץ ", "")):
+        if cand in HEB_CITY_COORDS:
+            return HEB_CITY_COORDS[cand]
+    return None
 
 # Registered municipal sources: `center` + `trigger_radius_km` decide when a
 # source is queried for a given search location.
@@ -96,10 +129,16 @@ AGE_BUCKETS = [(0, 2, "0-2"), (3, 5, "3-5"), (6, 9, "6-9"), (10, 99, "10+")]
 # adult stand-up, storytelling festivals and lectures.
 FAMILY_KEYWORDS = ["ילדים", "לילדים", "הורים וילדים", "משפחה", "משפחות", "משפחתי", "משפחתית",
                    "לכל המשפחה", "שעת סיפור", "תיאטרון בובות", "הצגת ילדים", "הצגה לילדים",
-                   "לגיל הרך", "פעוטות", "קטנטנים", "הפעלה לילדים", "יצירה לילדים", "טף"]
+                   "לגיל הרך", "פעוטות", "קטנטנים", "הפעלה לילדים", "יצירה לילדים"]
 ADULT_KEYWORDS = ["סטנדאפ", "סטנד אפ", "למבוגרים", "18+", "+18", "מסיבת", "בירה", "יין ",
                   "גמלאים", "אזרחים ותיקים", "ותיקים", "רווקים", "זוגות", "נשים בלבד",
-                  "הרצאה", "הרצאות"]
+                  "הרצאה", "הרצאות", "לגיל השלישי", "טקס", "אזכרה"]
+KID_WORDS = ["ילדים", "לילדים", "פעוטות", "הצגת ילדים", "קטנטנים", "לגיל הרך", "שעת סיפור"]
+
+
+def _adult_only(name):
+    """Adult format in the title, not explicitly aimed at kids ("סטנדאפ לילדים" is fine)."""
+    return _has(name, ADULT_KEYWORDS) and not _has(name, KID_WORDS)
 
 
 def _has(text, words):
@@ -144,13 +183,15 @@ def _detect_category(text):
     return "activity"
 
 
-def is_family(text, ages=None, audience=None):
+def is_family(text, ages=None, audience=None, name=None):
     """Kids/family classification. `audience` is the source's own target-audience
     field when it has one (most reliable); otherwise fall back to keywords."""
     # Adult formats win even when a source tags them "families" (e.g. stand-up),
-    # unless the text explicitly targets kids.
-    if _has(text, ADULT_KEYWORDS) and not _has(text, ["ילדים", "לילדים", "פעוטות"]):
+    # unless the title explicitly targets kids.
+    if _has(text, ADULT_KEYWORDS) and not _has(name if name is not None else text, KID_WORDS):
         return False
+    if name and _has(name, KID_WORDS):
+        return True  # the title itself targets kids, whatever the audience field says
     if audience is not None:
         return _has(audience, ["ילדים", "משפחות", "פעוטות", "הורים"]) and not (
             _has(audience, ["מבוגרים", "ותיקים"]) and not _has(audience, ["ילדים", "פעוטות"]))
@@ -252,8 +293,8 @@ def _parse_modiin(html):
             id=f"modiin-{eid or len(events)}", name=name, category=_detect_category(full_text),
             venue=venue, city="מודיעין", address=venue, lat=lat, lng=lng, image=image,
             time=tm.group(1) if tm else "", date=ev_date.isoformat(),
-            price=_detect_price(full_text), ages=ages, family=is_family(full_text, ages),
-            description=description[:400], ticket_url=ticket_url, ics_url=ics_url,
+            price=_detect_price(full_text), ages=ages, family=is_family(full_text, ages, name=name),
+            description=description[:400], ticket_url=ticket_url or MODIIN_URL, ics_url=ics_url,
             source="Modi'in Municipality",
         ))
     return events
@@ -311,9 +352,14 @@ def _parse_holon(html):
             text = re.sub(r"\s+", " ", details.get_text(" ", strip=True))
             dm = re.search(r"תיאור\s*(.*?)(?:קרדיט צילום|הוסף ליומן|$)", text)
             description = (dm.group(1) if dm else "").strip()
+            # Drop link labels such as "לפרטים נוספים ולרכישת כרטיסים >>" / "... מבית תרבות ודעת >"
+            description = re.sub(r"(?:לפרטים נוספים[^>]{0,60})?\s*>+", " ", description)
+            description = re.sub(r"\s+", " ", description).strip()
             for img in details.find_all("img", src=True):
                 if "/SiteCollectionImages/" not in img["src"]:
-                    image = urljoin(HOLON_BASE, quote(img["src"], safe="/:%"))
+                    # Quote the Hebrew file name but keep the "?Height=250" query intact.
+                    path, _, query = img["src"].partition("?")
+                    image = urljoin(HOLON_BASE, quote(path, safe="/:%")) + (f"?{query}" if query else "")
                     break
             for a in details.find_all("a", href=True):
                 h = a["href"]
@@ -330,7 +376,7 @@ def _parse_holon(html):
             venue=venue, city="חולון", address=venue, lat=center[0], lng=center[1], image=image,
             time=tm.group(0) if tm else "", date=span[0].isoformat(),
             end_date=span[1].isoformat() if span[1] != span[0] else None,
-            price=_detect_price(blob), ages=ages, family=is_family(blob, ages, audience=audience),
+            price=_detect_price(blob), ages=ages, family=is_family(blob, ages, audience=audience, name=name),
             description=(description or category_he)[:400],
             ticket_url=ticket_url or f"{HOLON_BASE}/Havingfun/Lists/List/CustomDispForm.aspx?ID={eid}",
             ics_url=ics_url, source="Holon Municipality",
@@ -346,9 +392,12 @@ def fetch_holon():
 
 # One entry inside a community-centre page, e.g.
 # "יום שני 12.10.2026 בשעה 17:30 | מופע מוסיקלי בוקה בוקה | מתנ"ס רמות ספיר | 20 ₪ <description>"
-_HAIFA_SUB_RE = re.compile(
-    r"(\d{1,2})\.(\d{1,2})\.(\d{4})\s*בשעה\s*(\d{1,2}:\d{2})\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*"
-    r"(.*?)(?=(?:יום \S+\s+)?\d{1,2}\.\d{1,2}\.\d{4}\s*בשעה|ימי |חודש |לפרטים נוספים|$)")
+# A second event on the same day repeats only the time: "בשעה 20:30 | ...".
+_HAIFA_HEAD_RE = re.compile(r"(?:(\d{1,2})\.(\d{1,2})\.(\d{4})\s*)?בשעה\s*(\d{1,2}:\d{2})\s*\|")
+# Text that ends an entry: next weekday label, recurring activities, month header, footer.
+_DAYS = "ראשון|שני|שלישי|רביעי|חמישי|שישי|שבת"
+_HAIFA_END_RE = re.compile(
+    rf"\s*(?:יום (?:{_DAYS})\s*$|ימי (?:{_DAYS}).*$|חודש [א-ת]+.*$|לפרטים נוספים.*$)")
 _PRICE_RE = re.compile(r"^(?:עלות:?\s*)?(\d+\s*₪|ללא עלות|חינם)\s*")
 
 
@@ -393,14 +442,22 @@ def _haifa_sub_events(item, today):
     text = text[:cut] if cut > 0 else text
     center = EVENT_SOURCES[2]["center"]
     events = []
-    for m in _HAIFA_SUB_RE.finditer(text):
-        try:
-            d = date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
-        except ValueError:
+    heads = list(_HAIFA_HEAD_RE.finditer(text))
+    current = None
+    for i, m in enumerate(heads):
+        if m.group(1):
+            try:
+                current = date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+            except ValueError:
+                current = None
+                continue
+        d = current
+        body_end = heads[i + 1].start() if i + 1 < len(heads) else len(text)
+        body = _HAIFA_END_RE.sub("", text[m.end():body_end])
+        parts = [p.strip() for p in body.split("|")]
+        if d is None or d < today or len(parts) < 2 or not parts[0]:
             continue
-        if d < today:
-            continue
-        name, venue, rest = m.group(5).strip(), m.group(6).strip(), m.group(7).strip()
+        name, venue, rest = parts[0], parts[1], " | ".join(parts[2:]).strip()
         pm = _PRICE_RE.match(rest)
         price_raw = pm.group(1) if pm else ""
         description = rest[pm.end():] if pm else rest
@@ -413,7 +470,7 @@ def _haifa_sub_events(item, today):
             address=item["venue"], lat=center[0], lng=center[1], image=item["image"],
             time=m.group(4), date=d.isoformat(), price=price,
             price_text=price_raw if "₪" in price_raw else None, ages=ages,
-            family=is_family(blob, ages), description=description[:400],
+            family=is_family(blob, ages, name=name), description=description[:400],
             ticket_url=item["url"], source="Haifa Municipality",
         ))
     return events
@@ -445,7 +502,7 @@ def fetch_haifa():
             continue
         ages = _map_ages(it["name"])
         fam = it["eid"] in family_ids or is_family(it["name"], ages)
-        if _has(it["name"], ADULT_KEYWORDS) and not _has(it["name"], ["ילדים", "לילדים"]):
+        if _adult_only(it["name"]):
             fam = False
         events.append(_base_event(
             id=f"haifa-{it['eid']}-{span[0].isoformat()}-{it['time']}", name=it["name"],
@@ -505,7 +562,7 @@ def fetch_leaan():
             continue
         loc = e.get("location") or {}
         city = (loc.get("city") or "").strip()
-        coords = HEB_CITY_COORDS.get(city)
+        coords = city_coords(city)
         cats = e.get("categories") or {}
         cat_names = [c.get("category_name", "") for c in (cats.values() if isinstance(cats, dict) else cats)]
         cat_name = cat_names[0] if cat_names else ""
@@ -521,9 +578,9 @@ def fetch_leaan():
         eid = e.get("id")
         slug = quote((name or "event").replace(" ", "-"), safe="")
         # The site's category is authoritative; keywords only as a fallback.
-        family = (LEAAN_KIDS_CATEGORY in cat_names or eid in kids_ids
+        family = (LEAAN_KIDS_CATEGORY in cat_names or eid in kids_ids or _has(name, KID_WORDS)
                   or (not cat_names and is_family(name)))
-        if _has(name, ADULT_KEYWORDS):
+        if _adult_only(name):
             family = False
         out.append(_base_event(
             id=f"leaan-{eid}", name=name, category=_leaan_category(name, cat_name),
