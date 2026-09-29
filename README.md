@@ -18,7 +18,8 @@ netlify.toml Netlify build config (base=frontend)
 
 ## ⚠️ Important: Netlify hosts the FRONTEND only
 Netlify serves static sites. This project also needs the **FastAPI backend + MongoDB**
-running somewhere (Emergent Deploy, Render, Railway, Fly.io, a VPS, etc.).
+running somewhere. This repo is set up for **Render (free)** via `render.yaml` —
+step-by-step guide (FR): [`DEPLOIEMENT.md`](DEPLOIEMENT.md).
 Deploy the backend first, then point the frontend at it.
 
 ## Deploy the frontend on Netlify
@@ -56,7 +57,7 @@ Create `frontend/.env` with `REACT_APP_BACKEND_URL=http://localhost:8001`.
 | Where | Key | Purpose |
 |------|-----|---------|
 | frontend | `REACT_APP_BACKEND_URL` | Base URL of the backend API |
-| backend | `MONGO_URL` | MongoDB connection string |
+| backend | `MONGO_URL` | Optional MongoDB connection string (search log only; empty = no DB) |
 | backend | `DB_NAME` | Database name |
 | backend | `CORS_ORIGINS` | Comma-separated allowed origins |
 | backend | `GOOGLE_MAPS_API_KEY` | Google Places (New) + Geocoding API key |

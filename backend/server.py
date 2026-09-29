@@ -22,9 +22,11 @@ logger = logging.getLogger(__name__)
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+# MongoDB is optional: it only stores an anonymous search log.
+# Leave MONGO_URL empty to run without a database.
+mongo_url = os.environ.get('MONGO_URL', '').strip()
+client = AsyncIOMotorClient(mongo_url, serverSelectionTimeoutMS=3000) if mongo_url else None
+db = client[os.environ.get('DB_NAME', 'sababakids')] if client else None
 
 GOOGLE_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', '').strip()
 
@@ -218,6 +220,11 @@ async def root():
     return {"message": "SababaKids API running", "google_enabled": bool(GOOGLE_KEY)}
 
 
+@api_router.get("/health")
+async def health():
+    return {"status": "ok"}
+
+
 @api_router.post("/places/search")
 async def search_places(req: SearchRequest):
     lat, lng, resolved = await geocode(req)
@@ -268,14 +275,15 @@ async def search_places(req: SearchRequest):
 
     final.sort(key=lambda x: x["distance_km"])
 
-    try:
-        await db.searches.insert_one({
-            "location": resolved, "lat": lat, "lng": lng,
-            "radius_km": req.radius_km, "category": req.category,
-            "count": len(final), "at": datetime.now(timezone.utc).isoformat(),
-        })
-    except Exception:
-        pass
+    if db is not None:
+        try:
+            await db.searches.insert_one({
+                "location": resolved, "lat": lat, "lng": lng,
+                "radius_km": req.radius_km, "category": req.category,
+                "count": len(final), "at": datetime.now(timezone.utc).isoformat(),
+            })
+        except Exception:
+            pass
 
     return {
         "center": {"lat": lat, "lng": lng, "label": resolved},
@@ -365,4 +373,5 @@ app.add_middleware(
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
-    client.close()
+    if client:
+        client.close()
