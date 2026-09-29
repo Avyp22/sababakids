@@ -55,3 +55,9 @@ cd backend && pip install -r requirements-dev.txt && cp .env.example .env
 uvicorn server:app --reload --port 8001
 cd frontend && yarn install && yarn start   # frontend/.env : REACT_APP_BACKEND_URL=http://localhost:8001
 ```
+
+## Consommation Google
+- Recherche « Tout » : 4 appels Google lancés en parallèle (au lieu de 9 en série).
+- Une recherche identique dans l'heure est servie depuis le cache, sans appel Google.
+- Photos servies par le backend (`/api/photo/...`) : la clé Google n'est plus visible dans le navigateur, et chaque photo est mise en cache 24 h.
+- `GOOGLE_PLACES_DETAIL=basic` (variable Render) supprime notes et horaires → gamme Google moins chère, quota gratuit plus large.

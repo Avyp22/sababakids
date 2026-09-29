@@ -1,9 +1,12 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Query
+from fastapi import FastAPI, APIRouter, HTTPException, Query, Request
+from fastapi.responses import RedirectResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import re
+import time
+import asyncio
 import math
 import logging
 from pathlib import Path
@@ -63,21 +66,61 @@ def compute_open_now(hours):
 
 
 CATEGORY_TO_GOOGLE = {
-    "park": ("nearby", "park"),
-    "playground": ("nearby", "playground"),
-    "museum": ("nearby", "museum"),
-    "zoo": ("nearby", "zoo"),
-    "amusement_park": ("nearby", "amusement_park"),
-    "aquarium": ("nearby", "aquarium"),
+    "park": ("nearby", ["park"]),
+    "playground": ("nearby", ["playground"]),
+    "museum": ("nearby", ["museum"]),
+    "zoo": ("nearby", ["zoo"]),
+    "amusement_park": ("nearby", ["amusement_park"]),
+    "aquarium": ("nearby", ["aquarium"]),
     "beach": ("text", "beach"),
     "water_park": ("text", "water park"),
     "indoor_play": ("text", "indoor playground for kids"),
 }
 
+# "All" search: 4 Google calls instead of 9, by grouping Nearby types together.
+ALL_QUERIES = [
+    ("nearby", ["park", "playground"]),
+    ("nearby", ["museum", "zoo", "amusement_park", "aquarium", "water_park"]),
+    ("text", "beach"),
+    ("text", "indoor playground for kids"),
+]
+
 GOOGLE_TYPE_TO_CATEGORY = {
     "park": "park", "playground": "playground", "museum": "museum",
     "zoo": "zoo", "amusement_park": "amusement_park", "aquarium": "aquarium",
+    "water_park": "water_park", "beach": "beach",
 }
+
+# The field mask drives Google's price tier. "rich" (default) keeps rating +
+# opening hours; "basic" drops them for a cheaper tier with a larger free quota.
+PLACES_DETAIL = os.environ.get("GOOGLE_PLACES_DETAIL", "rich").strip().lower()
+BASIC_FIELDS = (
+    "places.id,places.displayName,places.formattedAddress,places.location,"
+    "places.primaryType,places.types,places.photos,places.googleMapsUri"
+)
+RICH_FIELDS = BASIC_FIELDS + ",places.rating,places.userRatingCount,places.currentOpeningHours"
+PLACES_FIELD_MASK = BASIC_FIELDS if PLACES_DETAIL == "basic" else RICH_FIELDS
+
+CACHE_TTL_S = 3600          # identical searches within 1h reuse Google results
+PHOTO_CACHE_TTL_S = 86400
+_places_cache = {}
+_photo_cache = {}
+_geocode_cache = {}
+PHOTO_NAME_RE = re.compile(r"^places/[A-Za-z0-9_-]+/photos/[A-Za-z0-9_-]+$")
+PUBLIC_URL = os.environ.get("RENDER_EXTERNAL_URL", "").rstrip("/")
+
+
+def cache_get(cache, key, ttl):
+    hit = cache.get(key)
+    if hit and time.time() - hit[0] < ttl:
+        return hit[1]
+    return None
+
+
+def cache_put(cache, key, value, max_items=1000):
+    if len(cache) >= max_items:
+        cache.pop(next(iter(cache)))
+    cache[key] = (time.time(), value)
 
 INDOOR_CATEGORIES = {"museum", "aquarium", "indoor_play"}
 
@@ -118,6 +161,10 @@ async def geocode(req: SearchRequest):
         if city in key:
             return coords[0], coords[1], text
 
+    cached = cache_get(_geocode_cache, key, 30 * 86400)
+    if cached:
+        return cached
+
     if GOOGLE_KEY:
         try:
             async with httpx.AsyncClient(timeout=12) as hc:
@@ -128,7 +175,9 @@ async def geocode(req: SearchRequest):
                 data = r.json()
                 if data.get("status") == "OK" and data.get("results"):
                     loc = data["results"][0]["geometry"]["location"]
-                    return loc["lat"], loc["lng"], data["results"][0]["formatted_address"]
+                    result = (loc["lat"], loc["lng"], data["results"][0]["formatted_address"])
+                    cache_put(_geocode_cache, key, result)
+                    return result
         except Exception as e:
             logger.warning(f"Geocode failed: {e}")
 
@@ -138,23 +187,26 @@ async def geocode(req: SearchRequest):
 
 # ---------- Google Places ----------
 
-async def google_places(category, lat, lng, radius_m):
-    mode, value = CATEGORY_TO_GOOGLE.get(category, ("nearby", "park"))
-    mask = (
-        "places.id,places.displayName,places.formattedAddress,places.location,"
-        "places.primaryType,places.types,places.photos,places.rating,"
-        "places.userRatingCount,places.googleMapsUri,places.goodForChildren,"
-        "places.currentOpeningHours,places.regularOpeningHours"
-    )
+def _category_for(p, fallback):
+    primary = p.get("primaryType")
+    if primary in GOOGLE_TYPE_TO_CATEGORY:
+        return GOOGLE_TYPE_TO_CATEGORY[primary]
+    for t in p.get("types", []):
+        if t in GOOGLE_TYPE_TO_CATEGORY:
+            return GOOGLE_TYPE_TO_CATEGORY[t]
+    return fallback
+
+
+async def google_places(hc, mode, value, fallback_cat, lat, lng, radius_m, photo_base):
     headers = {
         "X-Goog-Api-Key": GOOGLE_KEY,
         "Content-Type": "application/json",
-        "X-Goog-FieldMask": mask,
+        "X-Goog-FieldMask": PLACES_FIELD_MASK,
     }
     if mode == "nearby":
         url = "https://places.googleapis.com/v1/places:searchNearby"
         body = {
-            "includedTypes": [value],
+            "includedTypes": value,
             "maxResultCount": 20,
             "locationRestriction": {"circle": {"center": {"latitude": lat, "longitude": lng}, "radius": radius_m}},
         }
@@ -165,28 +217,31 @@ async def google_places(category, lat, lng, radius_m):
             "maxResultCount": 20,
             "locationBias": {"circle": {"center": {"latitude": lat, "longitude": lng}, "radius": radius_m}},
         }
-    async with httpx.AsyncClient(timeout=15) as hc:
-        r = await hc.post(url, headers=headers, json=body)
+    cache_key = (url, str(value), round(lat, 2), round(lng, 2), radius_m, PLACES_FIELD_MASK)
+    data = cache_get(_places_cache, cache_key, CACHE_TTL_S)
+    if data is None:
+        try:
+            r = await hc.post(url, headers=headers, json=body)
+        except httpx.HTTPError as e:
+            logger.warning(f"Google Places request failed: {e}")
+            return []
         if r.is_error:
             logger.warning(f"Google Places error {r.status_code}: {r.text[:200]}")
             return []
         data = r.json()
+        cache_put(_places_cache, cache_key, data)
 
     out = []
     for p in data.get("places", []):
         loc = p.get("location", {})
-        types = p.get("types", [])
-        cat = category
-        for t in types:
-            if t in GOOGLE_TYPE_TO_CATEGORY:
-                cat = GOOGLE_TYPE_TO_CATEGORY[t]
-                break
+        cat = _category_for(p, fallback_cat)
         photo = None
         if p.get("photos"):
             name = p["photos"][0].get("name")
             if name:
-                photo = f"https://places.googleapis.com/v1/{name}/media?maxWidthPx=800&key={GOOGLE_KEY}"
-        oh = p.get("currentOpeningHours") or p.get("regularOpeningHours") or {}
+                # Served through our backend: hides the API key and caches the photo URL.
+                photo = f"{photo_base}/api/photo/{name}"
+        oh = p.get("currentOpeningHours") or {}
         open_now = oh.get("openNow")
         hours_text = "; ".join(oh.get("weekdayDescriptions", [])[:1]) or "See Google Maps for hours"
         out.append({
@@ -206,7 +261,7 @@ async def google_places(category, lat, lng, radius_m):
             "price": None,
             "hours": hours_text,
             "open_now": open_now,
-            "features": ["good_for_children"] if p.get("goodForChildren") else [],
+            "features": [],
             "google_maps_uri": p.get("googleMapsUri"),
             "source": "google",
         })
@@ -225,16 +280,45 @@ async def health():
     return {"status": "ok"}
 
 
+@api_router.get("/photo/{name:path}")
+async def place_photo(name: str):
+    if not GOOGLE_KEY or not PHOTO_NAME_RE.match(name):
+        raise HTTPException(status_code=404, detail="Photo not found")
+    uri = cache_get(_photo_cache, name, PHOTO_CACHE_TTL_S)
+    if uri is None:
+        async with httpx.AsyncClient(timeout=10) as hc:
+            r = await hc.get(
+                f"https://places.googleapis.com/v1/{name}/media",
+                params={"maxWidthPx": 600, "skipHttpRedirect": "true", "key": GOOGLE_KEY},
+            )
+        uri = None if r.is_error else r.json().get("photoUri")
+        if not uri:
+            logger.warning(f"Google photo error {r.status_code}: {r.text[:200]}")
+            raise HTTPException(status_code=404, detail="Photo not found")
+        cache_put(_photo_cache, name, uri, max_items=5000)
+    return RedirectResponse(uri, status_code=302, headers={"Cache-Control": "public, max-age=86400"})
+
+
 @api_router.post("/places/search")
-async def search_places(req: SearchRequest):
+async def search_places(req: SearchRequest, request: Request):
     lat, lng, resolved = await geocode(req)
     radius_m = req.radius_km * 1000
-    categories = [req.category] if req.category != "all" else list(CATEGORY_TO_GOOGLE.keys())
 
     results = []
     if GOOGLE_KEY:
-        for cat in categories:
-            results.extend(await google_places(cat, lat, lng, radius_m))
+        if req.category == "all":
+            queries = [(mode, value, "park") for mode, value in ALL_QUERIES]
+        else:
+            mode, value = CATEGORY_TO_GOOGLE.get(req.category, ("nearby", ["park"]))
+            queries = [(mode, value, req.category)]
+        photo_base = PUBLIC_URL or str(request.base_url).rstrip("/")
+        async with httpx.AsyncClient(timeout=15) as hc:
+            batches = await asyncio.gather(*[
+                google_places(hc, mode, value, fallback, lat, lng, radius_m, photo_base)
+                for mode, value, fallback in queries
+            ])
+        for batch in batches:
+            results.extend(batch)
 
     # Always include curated Israeli activities (rich fallback + local knowledge)
     for a in ACTIVITIES:
