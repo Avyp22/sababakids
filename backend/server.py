@@ -387,7 +387,7 @@ async def search_places(req: SearchRequest, request: Request):
 
 
 @api_router.get("/events")
-async def get_events(
+def get_events(  # sync: FastAPI runs it in a threadpool so blocking scrapes don't stall other requests
     lat: Optional[float] = None,
     lng: Optional[float] = None,
     radius_km: float = Query(50, ge=1, le=200),
