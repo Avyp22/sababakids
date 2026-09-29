@@ -467,7 +467,7 @@ def _haifa_sub_events(item, today):
         ages = _map_ages(blob)
         price = "free" if price_raw in ("ללא עלות", "חינם") else ("paid" if "₪" in price_raw else _detect_price(blob))
         events.append(_base_event(
-            id=f"haifa-{item['eid']}-{d.isoformat()}-{m.group(4)}", name=name,
+            id=f"haifa-{item['eid']}-{d.isoformat()}-{m.group(4)}-{i}", name=name,
             category=_detect_category(blob), venue=venue or item["venue"], city="חיפה",
             address=item["venue"], lat=center[0], lng=center[1], image=item["image"],
             time=m.group(4), date=d.isoformat(), price=price,
