@@ -187,6 +187,23 @@ async def geocode(req: SearchRequest):
 
 # ---------- Google Places ----------
 
+# Google often tags these with secondary types like "park" or "museum"
+# (a cemetery with gardens, a synagogue with an exhibit) — not kids outings.
+EXCLUDED_TYPES = {
+    "cemetery", "funeral_home", "place_of_worship", "synagogue", "church", "mosque",
+    "hindu_temple", "hospital", "police", "courthouse", "local_government_office",
+}
+EXCLUDED_PRIMARY_TYPES = {
+    "bar", "night_club", "casino", "liquor_store", "wine_bar", "pub",
+    "lodging", "hotel", "motel", "hostel", "apartment_building", "real_estate_agency",
+}
+
+
+def _is_excluded(p):
+    types = set(p.get("types", []))
+    return bool(types & EXCLUDED_TYPES) or p.get("primaryType") in EXCLUDED_TYPES | EXCLUDED_PRIMARY_TYPES
+
+
 def _category_for(p, fallback):
     primary = p.get("primaryType")
     if primary in GOOGLE_TYPE_TO_CATEGORY:
@@ -237,6 +254,8 @@ async def google_places(hc, mode, value, fallback_cat, lat, lng, radius_m, photo
 
     out = []
     for p in data.get("places", []):
+        if _is_excluded(p):
+            continue
         loc = p.get("location", {})
         cat = _category_for(p, fallback_cat)
         photo = None
