@@ -199,9 +199,26 @@ EXCLUDED_PRIMARY_TYPES = {
 }
 
 
+# Some places are plain "park" for Google but aren't outings (name/address hints).
+EXCLUDED_NAME_WORDS = [
+    "בית עלמין", "בית קברות", "בית העלמין", "קברות", "cemetery", "graveyard", "memorial park",
+    "בית כנסת", "synagogue", "church", "כנסיה", "mosque", "מסגד",
+]
+# Misclassified by Google and not caught by the rules above; add a place id
+# here when a user reports one.
+EXCLUDED_PLACE_IDS = {
+    "ChIJ6x8sJ_e7HRURYmDH38A6sIA",  # Mike Brant boulevard, Haifa: inside the Hof HaCarmel cemetery
+}
+
+
 def _is_excluded(p):
     types = set(p.get("types", []))
-    return bool(types & EXCLUDED_TYPES) or p.get("primaryType") in EXCLUDED_TYPES | EXCLUDED_PRIMARY_TYPES
+    if types & EXCLUDED_TYPES or p.get("primaryType") in EXCLUDED_TYPES | EXCLUDED_PRIMARY_TYPES:
+        return True
+    if p.get("id") in EXCLUDED_PLACE_IDS:
+        return True
+    text = f"{p.get('displayName', {}).get('text', '')} {p.get('formattedAddress', '')}".lower()
+    return any(w in text for w in EXCLUDED_NAME_WORDS)
 
 
 def _category_for(p, fallback):
@@ -286,7 +303,6 @@ async def google_places(hc, mode, value, fallback_cat, lat, lng, radius_m, photo
             "open_now": open_now,
             "features": [],
             "google_maps_uri": p.get("googleMapsUri"),
-            "google_types": p.get("types", []),
             "source": "google",
         })
     return out

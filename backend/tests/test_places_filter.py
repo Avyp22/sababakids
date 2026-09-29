@@ -29,3 +29,12 @@ def test_beach_kept():
     p = {"primaryType": "beach", "types": ["beach", "natural_feature"]}
     assert not _is_excluded(p)
     assert _category_for(p, "park") == "beach"
+
+
+def test_cemetery_by_name_is_excluded():
+    assert _is_excluded({"primaryType": "park", "types": ["park"],
+                         "displayName": {"text": "בית העלמין חוף הכרמל"}})
+
+
+def test_blocklisted_id_is_excluded():
+    assert _is_excluded({"id": "ChIJ6x8sJ_e7HRURYmDH38A6sIA", "primaryType": "park", "types": ["park"]})
