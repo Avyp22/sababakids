@@ -1,0 +1,59 @@
+# Fetches event sources that block the Render server (see GEO_BLOCKED in
+# backend/events_source.py) and publishes JSON snapshots on the `event-data`
+# branch. The backend on Render reads them from raw.githubusercontent.com.
+# Holon only answers Israeli IPs, so from here it usually fails and its previous
+# snapshot is kept (it can be refreshed from a computer in Israel, see DEPLOIEMENT.md).
+name: event-snapshots
+
+on:
+  schedule:
+    - cron: "17 */3 * * *"   # every 3 hours
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["backend/events_source.py", "backend/snapshot_events.py", ".github/workflows/event-snapshots.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: event-snapshots
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -q httpx==0.28.1 beautifulsoup4==4.15.0 lxml==6.1.3 tzdata
+
+      - name: Prepare event-data branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin event-data >/dev/null; then
+            git worktree add -B event-data data origin/event-data
+          else
+            git worktree add --detach data
+            git -C data checkout --orphan event-data
+            git -C data rm -rfq .
+          fi
+
+      - name: Fetch snapshots
+        working-directory: backend
+        run: python snapshot_events.py --out ../data haifa holon || echo "some sources failed"
+
+      - name: Publish
+        working-directory: data
+        run: |
+          git add -A
+          if git diff --cached --quiet; then echo "No changes"; exit 0; fi
+          git commit -qm "Event snapshots $(date -u +%FT%TZ)"
+          git push -q origin event-data

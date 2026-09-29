@@ -9,6 +9,7 @@ Sources (all public, server-rendered pages):
 Each connector returns a list of normalised event dicts. Results are cached 30 min
 per source; on a failed fetch the last good result is kept.
 """
+import os
 import re
 import time
 import json
@@ -75,6 +76,15 @@ EVENT_SOURCES = [
     {"key": "holon", "name": "Holon Municipality", "center": (32.0117, 34.7745), "trigger_radius_km": 35},
     {"key": "haifa", "name": "Haifa Municipality", "center": (32.7940, 34.9896), "trigger_radius_km": 40},
 ]
+
+# Sites that block the Render server's IPs (Holon: Israel-only, Haifa: blocks
+# Render). On Render these are read from snapshots that snapshot_events.py
+# publishes on the `event-data` branch (GitHub Action / a computer in Israel).
+GEO_BLOCKED = {"holon", "haifa"}
+SNAPSHOT_BASE = os.environ.get(
+    "EVENT_SNAPSHOT_BASE", "https://raw.githubusercontent.com/Avyp22/sababakids/event-data")
+SNAPSHOT_MAX_AGE_DAYS = 14
+USE_SNAPSHOTS = bool(os.environ.get("RENDER")) or os.environ.get("EVENT_USE_SNAPSHOTS") == "1"
 
 _CACHE = {}          # key -> (timestamp, [events])
 _CACHE_TTL = 1800    # 30 minutes
@@ -467,14 +477,36 @@ SOURCE_NAMES = {s["key"]: s["name"] for s in EVENT_SOURCES}
 SOURCE_NAMES["leaan"] = "Leaan (national)"
 
 
+def fetch_snapshot(key):
+    """Events for `key` from the published snapshot, dropping past ones."""
+    r = httpx.get(f"{SNAPSHOT_BASE}/{key}.json", timeout=15, headers=UA)
+    r.raise_for_status()
+    payload = r.json()
+    generated = datetime.fromisoformat(payload["generated_at"])
+    if datetime.now(TZ) - generated > timedelta(days=SNAPSHOT_MAX_AGE_DAYS):
+        raise RuntimeError(f"snapshot too old ({payload['generated_at']})")
+    today = datetime.now(TZ).date()
+    events = []
+    for ev in payload["events"]:
+        end = date.fromisoformat(ev.get("end_date") or ev["date"])
+        if end < today:
+            continue
+        if ev["date"] < today.isoformat():
+            ev = {**ev, "date": today.isoformat()}  # multi-day event already running
+        events.append(ev)
+    return events
+
+
 def fetch_source(key):
     cached = _CACHE.get(key)
     if cached and (time.time() - cached[0]) < _CACHE_TTL:
         return cached[1]
     try:
-        events = FETCHERS[key]()
+        use_snapshot = USE_SNAPSHOTS and key in GEO_BLOCKED
+        events = fetch_snapshot(key) if use_snapshot else FETCHERS[key]()
         _CACHE[key] = (time.time(), events)
-        _STATUS[key] = {"ok": True, "count": len(events), "at": datetime.now(TZ).isoformat()}
+        _STATUS[key] = {"ok": True, "count": len(events), "at": datetime.now(TZ).isoformat(),
+                        "via": "snapshot" if use_snapshot else "direct"}
         return events
     except Exception as e:
         logger.warning(f"Event source '{key}' failed: {e}")
