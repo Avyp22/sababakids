@@ -51,3 +51,10 @@ def test_park_named_like_town_stays_park():
     # "Ein" inside a word must not trigger; museums are never reclassified
     assert _category_for({"primaryType": "park", "types": ["park"], "displayName": {"text": "Gan Meir Park"}}, "park") == "park"
     assert _category_for({"primaryType": "museum", "types": ["museum"], "displayName": {"text": "מוזיאון עין הוד"}}, "museum") == "museum"
+
+
+def test_clinic_named_maayan_is_not_nature():
+    from server import _is_natural
+    assert not _is_natural({"primaryType": "doctor", "types": ["doctor", "health"]})
+    assert _is_natural({"primaryType": "park", "types": ["park"]})
+    assert _is_natural({"primaryType": "tourist_attraction", "types": ["tourist_attraction", "natural_feature"]})

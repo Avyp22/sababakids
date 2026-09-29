@@ -75,7 +75,7 @@ CATEGORY_TO_GOOGLE = {
     "beach": ("text", "beach"),
     "water_park": ("text", "water park"),
     "indoor_play": ("text", "indoor playground for kids"),
-    "nature": ("text", "מעיין"),
+    "nature": ("text", "natural spring nature reserve"),
 }
 
 # "All" search: 4 Google calls instead of 9, by grouping Nearby types together.
@@ -98,6 +98,12 @@ NATURE_NAME_RE = re.compile(
     r"(^|\s)(עין|עיינות|מעיין|מעיינות|נחל|שמורת|בריכת|ברכת)\s|\bsprings?\b|\bnature reserve\b|\bwadi\b|\bstream\b",
     re.IGNORECASE)
 NATURE_OVERRIDABLE = {"park", "playground", "beach"}
+NATURAL_TYPES = {"park", "natural_feature", "national_park", "state_park", "hiking_area",
+                 "tourist_attraction", "campground", "beach"}
+
+
+def _is_natural(p):
+    return p.get("primaryType") in NATURAL_TYPES or bool(set(p.get("types", [])) & (NATURAL_TYPES - {"tourist_attraction"}))
 
 # The field mask drives Google's price tier. "rich" (default) keeps rating +
 # opening hours; "basic" drops them for a cheaper tier with a larger free quota.
@@ -287,6 +293,8 @@ async def google_places(hc, mode, value, fallback_cat, lat, lng, radius_m, photo
             continue
         loc = p.get("location", {})
         cat = _category_for(p, fallback_cat)
+        if cat == "nature" and not _is_natural(p):
+            continue  # e.g. a clinic named "Maayan" returned by the spring search
         photo = None
         if p.get("photos"):
             name = p["photos"][0].get("name")
