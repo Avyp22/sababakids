@@ -369,6 +369,12 @@ async def search_places(req: SearchRequest, request: Request):
     if GOOGLE_KEY:
         if req.category == "all":
             queries = [(mode, value, "park") for mode, value in ALL_QUERIES]
+        elif req.category == "nature":
+            # Springs are spread over several Google shapes: named places, "מעיין"
+            # results, and plain "parks" called עין/נחל (reclassified by name).
+            queries = [("text", "natural spring nature reserve", "nature"),
+                       ("text", "מעיין", "nature"),
+                       ("nearby", ["park"], "park")]
         else:
             mode, value = CATEGORY_TO_GOOGLE.get(req.category, ("nearby", ["park"]))
             queries = [(mode, value, req.category)]
