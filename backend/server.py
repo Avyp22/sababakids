@@ -224,10 +224,14 @@ async def google_places(hc, mode, value, fallback_cat, lat, lng, radius_m, photo
             r = await hc.post(url, headers=headers, json=body)
         except httpx.HTTPError as e:
             logger.warning(f"Google Places request failed: {e}")
-            return []
+            raise RuntimeError(f"request failed: {type(e).__name__}")
         if r.is_error:
             logger.warning(f"Google Places error {r.status_code}: {r.text[:200]}")
-            return []
+            try:
+                status = r.json().get("error", {}).get("status", "")
+            except ValueError:
+                status = ""
+            raise RuntimeError(f"{r.status_code} {status}".strip())
         data = r.json()
         cache_put(_places_cache, cache_key, data)
 
@@ -305,6 +309,7 @@ async def search_places(req: SearchRequest, request: Request):
     radius_m = req.radius_km * 1000
 
     results = []
+    google_errors = []
     if GOOGLE_KEY:
         if req.category == "all":
             queries = [(mode, value, "park") for mode, value in ALL_QUERIES]
@@ -316,9 +321,12 @@ async def search_places(req: SearchRequest, request: Request):
             batches = await asyncio.gather(*[
                 google_places(hc, mode, value, fallback, lat, lng, radius_m, photo_base)
                 for mode, value, fallback in queries
-            ])
+            ], return_exceptions=True)
         for batch in batches:
-            results.extend(batch)
+            if isinstance(batch, Exception):
+                google_errors.append(str(batch))
+            else:
+                results.extend(batch)
 
     # Always include curated Israeli activities (rich fallback + local knowledge)
     for a in ACTIVITIES:
@@ -373,6 +381,7 @@ async def search_places(req: SearchRequest, request: Request):
         "center": {"lat": lat, "lng": lng, "label": resolved},
         "count": len(final),
         "google_enabled": bool(GOOGLE_KEY),
+        "google_errors": sorted(set(google_errors)),
         "activities": final,
     }
 
