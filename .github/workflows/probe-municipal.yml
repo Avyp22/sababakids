@@ -1,0 +1,17 @@
+# Temporary probe: can GitHub-hosted runners reach geo-restricted municipal sites?
+name: probe-municipal
+
+on:
+  push:
+    paths: [".github/workflows/probe-municipal.yml"]
+  workflow_dispatch:
+
+jobs:
+  holon:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -fsS -m 40 -A "Mozilla/5.0" -o /dev/null -w "%{http_code}\n" https://www.holon.muni.il/Havingfun/Pages/AllEvents.aspx
+  haifa:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -fsS -m 40 -A "Mozilla/5.0" -o /dev/null -w "%{http_code}\n" https://www.haifa.muni.il/culture/city-events/
