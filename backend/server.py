@@ -286,6 +286,7 @@ async def google_places(hc, mode, value, fallback_cat, lat, lng, radius_m, photo
             "open_now": open_now,
             "features": [],
             "google_maps_uri": p.get("googleMapsUri"),
+            "google_types": p.get("types", []),
             "source": "google",
         })
     return out
