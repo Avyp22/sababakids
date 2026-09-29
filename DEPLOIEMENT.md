@@ -2,7 +2,7 @@
 
 | Pièce | Service gratuit | Rôle |
 |---|---|---|
-| Frontend React | **Netlify** (déjà en place) | Site statique |
+| Frontend React | **Render** Static Site (`sababakids`) — ou Netlify | Site statique |
 | Backend FastAPI | **Render** — plan Free | API `/api/...` |
 | Base de données | *Aucune* (optionnel : **MongoDB Atlas M0**) | Ne sert qu'à journaliser les recherches |
 | Réveil du backend | **GitHub Actions** (`.github/workflows/keep-alive.yml`) | Ping toutes les 14 min |
@@ -19,7 +19,13 @@
 > Si tu changes l'URL du site Netlify (domaine perso…), mets à jour `CORS_ORIGINS`
 > dans Render → service → Environment (liste séparée par des virgules, sans `/` final).
 
-## 2. Brancher Netlify sur ce backend
+## 2. Frontend
+Le Blueprint crée aussi le site statique `sababakids` → `https://sababakids.onrender.com`
+(gratuit, sans crédits, `REACT_APP_BACKEND_URL` déjà renseignée dans `render.yaml`).
+
+### Alternative : Netlify
+Le plan gratuit Netlify fonctionne par crédits ; une fois épuisés, les déploiements sont bloqués
+jusqu'au cycle suivant.
 1. Netlify → site `chipper-gumdrop-477ddd` → **Site configuration → Environment variables**.
 2. Ajouter `REACT_APP_BACKEND_URL` = `https://sababakids-api.onrender.com` (sans `/` final).
 3. **Deploys → Trigger deploy → Clear cache and deploy site** (la variable est intégrée au build).

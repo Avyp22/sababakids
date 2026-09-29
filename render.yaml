@@ -1,4 +1,4 @@
-# Render Blueprint — free hosting for the SababaKids FastAPI backend.
+# Render Blueprint — free hosting for SababaKids (FastAPI backend + React static site).
 # Render dashboard → New → Blueprint → pick this repo.
 services:
   - type: web
@@ -15,10 +15,30 @@ services:
       - key: PYTHON_VERSION
         value: 3.12.7
       - key: CORS_ORIGINS
-        value: https://chipper-gumdrop-477ddd.netlify.app,http://localhost:3000
+        value: https://sababakids.onrender.com,https://chipper-gumdrop-477ddd.netlify.app,http://localhost:3000
       - key: DB_NAME
         value: sababakids
       - key: MONGO_URL
         sync: false   # optional, set in the dashboard (MongoDB Atlas free M0)
       - key: GOOGLE_MAPS_API_KEY
         sync: false   # set in the dashboard, never commit it
+
+  - type: web
+    name: sababakids
+    runtime: static
+    rootDir: frontend
+    buildCommand: yarn install --frozen-lockfile && yarn build
+    staticPublishPath: build
+    autoDeploy: true
+    pullRequestPreviewsEnabled: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: CI
+        value: "false"
+      - key: REACT_APP_BACKEND_URL
+        value: https://sababakids-api.onrender.com
