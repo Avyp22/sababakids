@@ -1,41 +1,47 @@
 <!doctype html>
-<html lang="en">
+<html lang="he" dir="rtl">
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#000000" />
-        <meta name="description" content="SababaKids — kid &amp; family-friendly activities and events near you in Israel" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="theme-color" content="#E05A47" />
+        <title>SababaKids — activités et événements pour enfants en Israël</title>
+        <meta name="description" content="Parcs, plages, musées, zoos et spectacles pour enfants près de chez vous en Israël. פעילויות ואירועים לילדים לידכם. Kid-friendly outings near you in Israel." />
+
+        <link rel="icon" href="/favicon.ico" sizes="48x48" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-title" content="SababaKids" />
+
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="SababaKids" />
+        <meta property="og:title" content="SababaKids — sorties en famille en Israël" />
+        <meta property="og:description" content="Parcs, plages, musées et événements pour enfants près de chez vous. פעילויות לילדים בכל הארץ." />
+        <meta property="og:url" content="https://sababakids.onrender.com/" />
+        <meta property="og:image" content="https://sababakids.onrender.com/og-image.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:card" content="summary_large_image" />
+
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" rel="stylesheet" />
-        <!--
-        manifest.json provides metadata used when your web app is installed on a
-        user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-        -->
-        <!--
-        Notice the use of %PUBLIC_URL% in the tags above.
-        It will be replaced with the URL of the `public` folder during the build.
-        Only files inside the `public` folder can be referenced from the HTML.
-
-        Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-        work correctly both with client-side routing and a non-root public URL.
-        Learn how to configure a non-root public URL by running `npm run build`.
-        -->
-        <title>SababaKids</title>
-        <script>window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);</script>
+        <link rel="preconnect" href="https://sababakids-api.onrender.com" crossorigin />
+        <script>
+            // Apply saved language/theme before React loads to avoid a flash.
+            (function () {
+                try {
+                    var l = localStorage.getItem("sababakids_lang");
+                    if (!l) { var n = (navigator.language || "he").slice(0, 2); l = n === "fr" || n === "en" ? n : "he"; }
+                    document.documentElement.lang = l;
+                    document.documentElement.dir = l === "he" ? "rtl" : "ltr";
+                    var th = localStorage.getItem("sababakids_theme");
+                    if (th === "dark" || (!th && window.matchMedia("(prefers-color-scheme: dark)").matches)) document.documentElement.classList.add("dark");
+                } catch (e) {}
+            })();
+        </script>
     </head>
     <body>
-        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <noscript>SababaKids needs JavaScript to run.</noscript>
         <div id="root"></div>
-        <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
     </body>
 </html>

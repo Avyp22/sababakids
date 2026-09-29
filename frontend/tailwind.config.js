@@ -15,8 +15,8 @@ module.exports = {
         sm: 'calc(var(--radius) - 4px)'
       },
       fontFamily: {
-        heading: ['Outfit', 'system-ui', 'sans-serif'],
-        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif']
+        heading: ['Outfit', 'Rubik', 'system-ui', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'Rubik', 'system-ui', 'sans-serif']
       },
       colors: {
         background: 'hsl(var(--background))',

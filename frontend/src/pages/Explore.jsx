@@ -1,48 +1,56 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import { toast } from "sonner";
-import { LayoutGrid, Map as MapIcon, Calendar, Heart, Compass, SearchX, Loader2, Share2 } from "lucide-react";
+import { LayoutGrid, Map as MapIcon, Calendar, Heart, SearchX, Loader2, Share2, LocateFixed, X } from "lucide-react";
 import { Header } from "@/components/Header";
 import { FiltersBar } from "@/components/FiltersBar";
 import { ActivityCard } from "@/components/ActivityCard";
 import { ActivityDetail } from "@/components/ActivityDetail";
-import { MapView } from "@/components/MapView";
 import { EventsView } from "@/components/EventsView";
 import { searchActivities, getEvents } from "@/lib/api";
-import { useFavorites, useTheme } from "@/lib/store";
+import { useFavorites, useTheme, loadPrefs, savePrefs } from "@/lib/store";
+import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+// Leaflet is only downloaded when the Map tab is opened.
+const MapView = lazy(() => import("@/components/MapView"));
+
 const TABS = [
-  { id: "list", label: "Explore", icon: LayoutGrid },
-  { id: "map", label: "Map", icon: MapIcon },
-  { id: "events", label: "Events", icon: Calendar },
-  { id: "saved", label: "Saved", icon: Heart },
+  { id: "list", label: "tabExplore", icon: LayoutGrid },
+  { id: "map", label: "tabMap", icon: MapIcon },
+  { id: "events", label: "tabEvents", icon: Calendar },
+  { id: "saved", label: "tabSaved", icon: Heart },
 ];
 
+const DEFAULT_CENTER = { lat: 32.0853, lng: 34.7818, label: "Tel Aviv" };
+
 export default function Explore() {
+  const { t } = useI18n();
   const { dark, setDark } = useTheme();
   const { favorites, isFavorite, toggleFavorite } = useFavorites();
+  const [prefs] = useState(loadPrefs);
 
   const [tab, setTab] = useState("list");
-  const [locationInput, setLocationInput] = useState("Tel Aviv");
-  const [radius, setRadius] = useState(10);
-  const [category, setCategory] = useState("all");
-  const [ages, setAges] = useState([]);
+  const [locationInput, setLocationInput] = useState(prefs.location || "Tel Aviv");
+  const [radius, setRadius] = useState(prefs.radius || 10);
+  const [category, setCategory] = useState(prefs.category || "all");
+  const [ages, setAges] = useState(prefs.ages || []);
   const [setting, setSetting] = useState("all");
   const [price, setPrice] = useState("all");
   const [gpsCoords, setGpsCoords] = useState(null);
   const [gpsLoading, setGpsLoading] = useState(false);
+  const [showGpsPrompt, setShowGpsPrompt] = useState(!prefs.location);
 
-  const [center, setCenter] = useState({ lat: 32.0853, lng: 34.7818, label: "Tel Aviv" });
+  const [center, setCenter] = useState(DEFAULT_CENTER);
   const [activities, setActivities] = useState([]);
   const [events, setEvents] = useState([]);
   const [eventSources, setEventSources] = useState([]);
-  const [familyOnly, setFamilyOnly] = useState(false);
+  const [familyOnly, setFamilyOnly] = useState(prefs.familyOnly ?? true);
   const [loading, setLoading] = useState(true);
   const [eventsLoading, setEventsLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
-  const [googleEnabled, setGoogleEnabled] = useState(false);
+  const [googleDown, setGoogleDown] = useState(false);
 
   const toggleAge = (id) =>
     setAges((prev) => (prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]));
@@ -57,16 +65,20 @@ export default function Explore() {
       const data = await searchActivities(payload);
       setActivities(data.activities);
       setCenter(data.center);
-      setGoogleEnabled(data.google_enabled);
+      setGoogleDown(!data.google_enabled || (data.google_errors || []).length > 0);
+      if (!gpsCoords) savePrefs({ location: locationInput });
     } catch (e) {
-      toast.error("Could not load activities. Please try again.");
+      toast.error(t("loadError"));
     } finally {
       setLoading(false);
     }
-  }, [radius, category, ages, setting, price, gpsCoords, locationInput]);
+  }, [radius, category, ages, setting, price, gpsCoords, locationInput, t]);
 
   // Re-run when filters change
   useEffect(() => { runSearch(); }, [radius, category, ages, setting, price, gpsCoords]); // eslint-disable-line
+
+  // Remember the user's usual filters
+  useEffect(() => { savePrefs({ radius, category, ages, familyOnly }); }, [radius, category, ages, familyOnly]);
 
   // Load events for current center
   useEffect(() => {
@@ -79,27 +91,41 @@ export default function Explore() {
     return () => { active = false; };
   }, [center.lat, center.lng, familyOnly]); // eslint-disable-line
 
-  const handleUseGps = () => {
-    if (!navigator.geolocation) return toast.error("Geolocation not supported on this device.");
+  const handleUseGps = useCallback((silent = false) => {
+    if (!navigator.geolocation) {
+      if (!silent) toast.error(t("gpsUnsupported"));
+      return;
+    }
     setGpsLoading(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setGpsCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        setLocationInput("My location");
+        setLocationInput(t("myLocation"));
         setGpsLoading(false);
-        toast.success("Using your current location");
+        setShowGpsPrompt(false);
+        if (!silent) toast.success(t("gpsOk"));
       },
       () => {
         setGpsLoading(false);
-        toast.error("Couldn't get your location. Try typing a city instead.");
+        if (!silent) toast.error(t("gpsFail"));
       },
-      { enableHighAccuracy: true, timeout: 8000 }
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 300000 }
     );
-  };
+  }, [t]);
+
+  // If the user already allowed location access, use it straight away.
+  useEffect(() => {
+    if (prefs.location || !navigator.permissions?.query) return;
+    navigator.permissions.query({ name: "geolocation" })
+      .then((st) => { if (st.state === "granted") handleUseGps(true); })
+      .catch(() => {});
+  }, []); // eslint-disable-line
 
   const onManualSearch = () => {
-    setGpsCoords(null);
-    runSearch();
+    setShowGpsPrompt(false);
+    // Clearing GPS coords re-triggers the search effect; otherwise search directly.
+    if (gpsCoords) setGpsCoords(null);
+    else runSearch();
   };
 
   const openDetail = (a) => { setSelected(a); setDetailOpen(true); };
@@ -110,18 +136,18 @@ export default function Explore() {
       const maps = a.google_maps_uri || `https://www.google.com/maps/search/?api=1&query=${a.lat},${a.lng}`;
       return `${i + 1}. ${a.name} (${a.city || a.address})\n   ${maps}`;
     });
-    const text = `👨‍👩‍👧‍👦 Our SababaKids family activity list:\n\n${lines.join("\n\n")}`;
+    const text = `👨‍👩‍👧‍👦 ${t("shareIntro")}\n\n${lines.join("\n\n")}\n\n${window.location.origin}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
-    toast.success("Opening WhatsApp to share your list");
+    toast.success(t("shareOpening"));
   };
 
-  const savedList = useMemo(() => favorites, [favorites]);
-  const gridData = tab === "saved" ? savedList : activities;
+  const centerLabel = center.label === "Your location" ? t("yourLocation") : center.label;
+  const gridData = tab === "saved" ? favorites : activities;
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Header
-        locationLabel={center.label}
+        locationLabel={centerLabel}
         favCount={favorites.length}
         dark={dark}
         onToggleDark={() => setDark(!dark)}
@@ -132,7 +158,7 @@ export default function Explore() {
         locationInput={locationInput}
         setLocationInput={setLocationInput}
         onSearch={onManualSearch}
-        onUseGps={handleUseGps}
+        onUseGps={() => handleUseGps(false)}
         gpsLoading={gpsLoading}
         radius={radius} setRadius={setRadius}
         category={category} setCategory={setCategory}
@@ -142,24 +168,37 @@ export default function Explore() {
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-5">
+        {showGpsPrompt && !gpsCoords && (
+          <div className="mb-4 flex items-center gap-3 bg-primary/10 border border-primary/20 rounded-2xl px-4 py-3" data-testid="gps-prompt">
+            <LocateFixed className="w-5 h-5 text-primary shrink-0" />
+            <p className="text-sm font-medium flex-1">{t("gpsPrompt")}</p>
+            <Button size="sm" className="rounded-xl" onClick={() => handleUseGps(false)} disabled={gpsLoading}>
+              {t("gpsPromptBtn")}
+            </Button>
+            <button onClick={() => setShowGpsPrompt(false)} aria-label="close" className="text-muted-foreground">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
         {/* Desktop tabs + result count */}
         <div className="flex items-center justify-between mb-5 gap-3">
           <div className="hidden md:flex bg-muted rounded-2xl p-1">
-            {TABS.map((t) => {
-              const Icon = t.icon;
+            {TABS.map((tb) => {
+              const Icon = tb.icon;
               return (
                 <button
-                  key={t.id}
-                  onClick={() => setTab(t.id)}
-                  data-testid={`tab-${t.id}`}
+                  key={tb.id}
+                  onClick={() => setTab(tb.id)}
+                  data-testid={`tab-${tb.id}`}
                   className={cn(
                     "flex items-center gap-2 px-4 h-10 rounded-xl text-sm font-semibold transition-colors",
-                    tab === t.id ? "bg-card shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"
+                    tab === tb.id ? "bg-card shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"
                   )}
                 >
                   <Icon className="w-4 h-4" />
-                  {t.label}
-                  {t.id === "saved" && favorites.length > 0 && (
+                  {t(tb.label)}
+                  {tb.id === "saved" && favorites.length > 0 && (
                     <span className="text-xs bg-primary text-primary-foreground rounded-full px-1.5">{favorites.length}</span>
                   )}
                 </button>
@@ -169,30 +208,28 @@ export default function Explore() {
 
           <div className="text-sm text-muted-foreground" data-testid="result-summary">
             {tab === "events" ? (
-              <span>{events.length} upcoming events</span>
+              <span>{t("upcomingEvents", { n: events.length })}</span>
             ) : tab === "saved" ? (
-              <span>{savedList.length} saved</span>
+              <span>{t("savedCount", { n: favorites.length })}</span>
             ) : loading ? (
-              <span className="flex items-center gap-1.5"><Loader2 className="w-3.5 h-3.5 animate-spin" /> Searching…</span>
+              <span className="flex items-center gap-1.5"><Loader2 className="w-3.5 h-3.5 animate-spin" /> {t("searching")}</span>
             ) : (
-              <span><b className="text-foreground">{activities.length}</b> activities near <b className="text-foreground">{center.label}</b></span>
+              <span>{t("activitiesNear", { n: activities.length, place: centerLabel })}</span>
             )}
           </div>
         </div>
 
-        {googleEnabled === false && tab !== "events" && (
+        {googleDown && !loading && (tab === "list" || tab === "map") && (
           <div className="mb-4 text-xs text-muted-foreground bg-accent/10 border border-accent/20 rounded-xl px-3 py-2" data-testid="google-notice">
-            Showing curated Israeli activities. Add a Google Maps API key to include live nearby places.
+            {t("curatedOnly")}
           </div>
         )}
 
-        {tab === "saved" && savedList.length > 0 && (
-          <div className="mb-4 flex items-center justify-between gap-3 bg-secondary/10 border border-secondary/20 rounded-2xl px-4 py-3">
-            <p className="text-sm font-medium text-foreground/80">
-              Plan your outing — share this list with the family.
-            </p>
+        {tab === "saved" && favorites.length > 0 && (
+          <div className="mb-4 flex items-center justify-between gap-3 bg-secondary/10 border border-secondary/20 rounded-2xl px-4 py-3 flex-wrap">
+            <p className="text-sm font-medium text-foreground/80">{t("shareHint")}</p>
             <Button onClick={shareFavorites} className="rounded-xl gap-2 bg-[#25D366] hover:bg-[#1ebe5b] text-white" data-testid="btn-share-whatsapp">
-              <Share2 className="w-4 h-4" /> Share on WhatsApp
+              <Share2 className="w-4 h-4" /> {t("shareWhatsapp")}
             </Button>
           </div>
         )}
@@ -200,30 +237,36 @@ export default function Explore() {
         {tab === "events" && (
           <div className="mb-4 flex items-center justify-between gap-3 flex-wrap">
             <div className="text-xs text-muted-foreground flex items-center gap-1.5" data-testid="events-source-note">
-              {eventSources.length > 0 ? (
-                <><span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Live events from {eventSources.join(", ")} + curated picks</>
-              ) : (
-                <>Curated family events near you</>
+              {eventSources.length > 0 && (
+                <><span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> {t("liveFrom", { sources: eventSources.join(", ") })}</>
               )}
             </div>
-            <button
-              onClick={() => setFamilyOnly((v) => !v)}
-              data-testid="toggle-family-only"
-              className={cn(
-                "px-3 h-8 rounded-full text-xs font-semibold border transition-colors",
-                familyOnly ? "bg-secondary text-secondary-foreground border-secondary" : "bg-background border-border text-muted-foreground"
-              )}
-            >
-              {familyOnly ? "👨‍👩‍👧 Family events only" : "Showing all events"}
-            </button>
+            <div className="flex bg-muted rounded-full p-0.5" role="group">
+              {[true, false].map((v) => (
+                <button
+                  key={String(v)}
+                  onClick={() => setFamilyOnly(v)}
+                  aria-pressed={familyOnly === v}
+                  data-testid={v ? "toggle-family-only" : "toggle-all-events"}
+                  className={cn(
+                    "px-3 h-8 rounded-full text-xs font-semibold transition-colors",
+                    familyOnly === v ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"
+                  )}
+                >
+                  {v ? `👨‍👩‍👧 ${t("familyOnly")}` : t("allEvents")}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
         {/* Content */}
         {tab === "map" ? (
-          <MapView center={center} activities={activities} onOpen={openDetail} />
+          <Suspense fallback={<div className="h-[420px] rounded-3xl bg-muted animate-pulse" />}>
+            <MapView center={center} activities={activities} onOpen={openDetail} />
+          </Suspense>
         ) : tab === "events" ? (
-          <EventsView events={events} loading={eventsLoading} />
+          <EventsView events={events} loading={eventsLoading} familyOnly={familyOnly} />
         ) : loading && tab === "list" ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -257,23 +300,24 @@ export default function Explore() {
       />
 
       {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-lg border-t border-border px-2 py-2 flex justify-around">
-        {TABS.map((t) => {
-          const Icon = t.icon;
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-card/95 backdrop-blur-lg border-t border-border px-2 py-2 flex justify-around">
+        {TABS.map((tb) => {
+          const Icon = tb.icon;
           return (
             <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              data-testid={`nav-${t.id}`}
+              key={tb.id}
+              onClick={() => setTab(tb.id)}
+              data-testid={`nav-${tb.id}`}
+              aria-current={tab === tb.id ? "page" : undefined}
               className={cn(
                 "flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl relative transition-colors",
-                tab === t.id ? "text-primary" : "text-muted-foreground"
+                tab === tb.id ? "text-primary" : "text-muted-foreground"
               )}
             >
               <Icon className="w-5 h-5" />
-              <span className="text-[10px] font-semibold">{t.label}</span>
-              {t.id === "saved" && favorites.length > 0 && (
-                <span className="absolute top-0 right-1 w-4 h-4 bg-primary text-primary-foreground text-[9px] rounded-full flex items-center justify-center font-bold">{favorites.length}</span>
+              <span className="text-[10px] font-semibold">{t(tb.label)}</span>
+              {tb.id === "saved" && favorites.length > 0 && (
+                <span className="absolute top-0 end-1 w-4 h-4 bg-primary text-primary-foreground text-[9px] rounded-full flex items-center justify-center font-bold">{favorites.length}</span>
               )}
             </button>
           );
@@ -284,6 +328,7 @@ export default function Explore() {
 }
 
 function EmptyState({ tab }) {
+  const { t } = useI18n();
   const saved = tab === "saved";
   return (
     <div className="text-center py-20 animate-fade-up" data-testid="empty-state">
@@ -291,12 +336,10 @@ function EmptyState({ tab }) {
         {saved ? <Heart className="w-7 h-7 text-muted-foreground" /> : <SearchX className="w-7 h-7 text-muted-foreground" />}
       </div>
       <h3 className="font-heading font-bold text-lg">
-        {saved ? "No saved activities yet" : "No activities match your filters"}
+        {saved ? t("noSaved") : t("noMatch")}
       </h3>
       <p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto">
-        {saved
-          ? "Tap the heart on any activity to build your family trip list."
-          : "Try widening the radius or clearing some filters."}
+        {saved ? t("noSavedHint") : t("noMatchHint")}
       </p>
     </div>
   );

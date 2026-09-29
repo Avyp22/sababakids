@@ -18,6 +18,9 @@ export const CATEGORIES = [
 
 export const CATEGORY_MAP = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
 
+// Translated label for a category id (uses the i18n `t` function).
+export const catLabel = (t, id) => t(`cat_${id}`);
+
 export const AGE_GROUPS = [
   { id: "0-2", label: "Baby", sub: "0-2" },
   { id: "3-5", label: "Toddler", sub: "3-5" },

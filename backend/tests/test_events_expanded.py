@@ -1,4 +1,4 @@
-"""Backend tests for expanded /api/events coverage (national + Modiin + curated)."""
+"""Backend tests for /api/events coverage (national Leaan + Modi'in, Holon, Haifa municipalities)."""
 import os
 from datetime import date
 
@@ -32,14 +32,16 @@ def _validate_event_shape(e):
 # --- Tel Aviv: mixed sources ---
 def test_events_tel_aviv_all(client):
     r = client.get(f"{API}/events", params={"lat": 32.0853, "lng": 34.7818,
-                                            "radius_km": 25, "family_only": "false"})
+                                            "radius_km": 40, "family_only": "false"})
     assert r.status_code == 200
     data = r.json()
     assert data["count"] > 0
     sources = set(e["source"] for e in data["events"])
     assert "Leaan (national)" in data["live_sources"], f"live_sources={data['live_sources']}"
-    # Modiin is ~28km from TA - trigger_radius_km=35 so should be included
+    # live_sources only lists sources that contributed events within the radius.
+    # Modi'in (~28km) and Holon (~8km) are both within 40km of Tel Aviv.
     assert "Modi'in Municipality" in data["live_sources"], f"live_sources={data['live_sources']}"
+    assert "Holon Municipality" in data["live_sources"], f"live_sources={data['live_sources']}"
     # dates sorted ascending
     dates = [e["date"] for e in data["events"]]
     assert dates == sorted(dates)
@@ -55,7 +57,7 @@ def test_events_tel_aviv_all(client):
 # --- Jerusalem ---
 def test_events_jerusalem_national(client):
     r = client.get(f"{API}/events", params={"lat": 31.7683, "lng": 35.2137,
-                                            "radius_km": 25, "family_only": "false"})
+                                            "radius_km": 40, "family_only": "false"})
     assert r.status_code == 200
     data = r.json()
     leaan = [e for e in data["events"] if e["source"] == "Leaan (national)"]
@@ -105,3 +107,24 @@ def test_places_regression(client):
     d = r.json()
     assert "google_enabled" in d
     assert d["count"] > 0
+
+
+# --- Haifa municipality + family classification ---
+def test_events_haifa_municipal(client):
+    r = client.get(f"{API}/events", params={"lat": 32.794, "lng": 34.9896, "radius_km": 15, "family_only": "false"})
+    assert r.status_code == 200
+    data = r.json()
+    assert "Haifa Municipality" in data["live_sources"], f"live_sources={data['live_sources']}"
+
+
+def test_family_only_excludes_standup(client):
+    r = client.get(f"{API}/events", params={"family_only": "true"})
+    for e in r.json()["events"]:
+        assert "סטנדאפ" not in e["name"] or "ילדים" in e["name"], f"adult event leaked: {e['name']}"
+
+
+def test_sources_status(client):
+    r = client.get(f"{API}/sources")
+    assert r.status_code == 200
+    data = r.json()
+    assert {"modiin", "holon", "haifa", "leaan"} <= set(data)

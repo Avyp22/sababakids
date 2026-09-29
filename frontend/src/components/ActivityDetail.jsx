@@ -5,41 +5,13 @@ import { Button } from "@/components/ui/button";
 import {
   Heart, Star, MapPin, Clock, Navigation, ExternalLink, Check,
 } from "lucide-react";
-import { CATEGORY_MAP } from "@/lib/categories";
-import { SettingBadge, PriceBadge, OpenNowBadge } from "@/components/ActivityCard";
+import { CATEGORY_MAP, catLabel } from "@/lib/categories";
+import { SettingBadge, PriceBadge, OpenNowBadge, SourceTag } from "@/components/ActivityCard";
+import { useI18n, FEATURE_LABELS } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
-const FEATURE_LABELS = {
-  stroller_friendly: "Stroller friendly",
-  parking: "Parking",
-  picnic: "Picnic area",
-  toilets: "Toilets",
-  lifeguard: "Lifeguard",
-  showers: "Showers",
-  food: "Food nearby",
-  cafe: "Cafe",
-  air_conditioned: "Air conditioned",
-  birthday_parties: "Birthday parties",
-  socks_required: "Socks required",
-  toddler_rides: "Toddler rides",
-  petting_zoo: "Petting zoo",
-  gift_shop: "Gift shop",
-  workshops: "Workshops",
-  multilingual: "Multilingual",
-  shade: "Shaded",
-  mini_train: "Mini train",
-  drive_through: "Drive-through safari",
-  sea_view: "Sea view",
-  cable_car: "Cable car",
-  boardwalk: "Boardwalk",
-  lockers: "Lockers",
-  skate_rental: "Skate rental",
-  beach: "Beach access",
-  outdoor_park: "Outdoor park",
-  good_for_children: "Good for children",
-};
-
 export function ActivityDetail({ activity, open, onClose, isFavorite, onToggleFavorite }) {
+  const { t, lang, rtl } = useI18n();
   if (!activity) return null;
   const cat = CATEGORY_MAP[activity.category] || CATEGORY_MAP.all;
   const Icon = cat.icon;
@@ -48,11 +20,14 @@ export function ActivityDetail({ activity, open, onClose, isFavorite, onToggleFa
     activity.google_maps_uri ||
     `https://www.google.com/maps/search/?api=1&query=${activity.lat},${activity.lng}`;
   const wazeUrl = `https://waze.com/ul?ll=${activity.lat},${activity.lng}&navigate=yes`;
+  // Curated descriptions are English-only; Google results get a translated line.
+  const description = activity.source === "google" ? t("googleResult") : activity.description;
+  const hours = activity.source === "google" && activity.hours === "See Google Maps for hours" ? null : activity.hours;
 
   return (
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
       <SheetContent
-        side="right"
+        side={rtl ? "left" : "right"}
         className="w-full sm:max-w-md p-0 overflow-y-auto"
         data-testid="activity-detail-drawer"
       >
@@ -65,19 +40,21 @@ export function ActivityDetail({ activity, open, onClose, isFavorite, onToggleFa
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-          <div className="absolute bottom-4 left-4 right-4">
+          <div className="absolute bottom-4 start-4 end-4">
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 text-xs font-bold w-fit mb-2" style={{ color: cat.color }}>
               <Icon className="w-3.5 h-3.5" />
-              {cat.label}
+              {catLabel(t, cat.id)}
             </div>
-            <h2 className="font-heading font-extrabold text-2xl text-white leading-tight drop-shadow">
+            <h2 className="font-heading font-extrabold text-2xl text-white leading-tight drop-shadow" dir="auto">
               {activity.name}
             </h2>
           </div>
           <button
             onClick={() => onToggleFavorite(activity)}
+            aria-label={t("tabSaved")}
+            aria-pressed={fav}
             data-testid="detail-save-favorite"
-            className="absolute top-4 right-4 w-11 h-11 rounded-full bg-white/90 backdrop-blur flex items-center justify-center hover:scale-110 transition-transform"
+            className="absolute top-4 end-[4.5rem] w-11 h-11 rounded-full bg-white/90 backdrop-blur flex items-center justify-center hover:scale-110 transition-transform"
           >
             <Heart className={cn("w-5 h-5", fav ? "fill-primary text-primary" : "text-slate-600")} />
           </button>
@@ -85,7 +62,7 @@ export function ActivityDetail({ activity, open, onClose, isFavorite, onToggleFa
 
         <SheetHeader className="sr-only">
           <SheetTitle>{activity.name}</SheetTitle>
-          <SheetDescription>Details, hours, age suitability and directions for {activity.name}.</SheetDescription>
+          <SheetDescription>{t("detailsFor", { name: activity.name })}</SheetDescription>
         </SheetHeader>
 
         <div className="p-5 space-y-5">
@@ -102,32 +79,32 @@ export function ActivityDetail({ activity, open, onClose, isFavorite, onToggleFa
             <OpenNowBadge openNow={activity.open_now} />
             {typeof activity.distance_km === "number" && (
               <span className="flex items-center gap-1 text-xs font-semibold text-muted-foreground">
-                <Navigation className="w-3.5 h-3.5" /> {activity.distance_km} km away
+                <Navigation className="w-3.5 h-3.5" /> {t("kmAway", { km: activity.distance_km })}
               </span>
             )}
           </div>
 
-          <p className="text-sm leading-relaxed text-foreground/80">{activity.description}</p>
+          <p className="text-sm leading-relaxed text-foreground/80" dir={activity.source === "google" ? undefined : "ltr"}>
+            {description}
+          </p>
 
           <div className="space-y-2 text-sm">
             <div className="flex items-start gap-2">
               <MapPin className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-              <span>{activity.address || activity.city}</span>
+              <span dir="auto">{activity.address || activity.city}</span>
             </div>
-            {activity.hours && (
-              <div className="flex items-start gap-2">
-                <Clock className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                <span>{activity.hours}</span>
-              </div>
-            )}
+            <div className="flex items-start gap-2">
+              <Clock className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+              <span dir="auto">{hours || t("hoursUnknown")}</span>
+            </div>
           </div>
 
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">Good for ages</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">{t("goodForAges")}</p>
             <div className="flex gap-1.5 flex-wrap">
               {(activity.ages || []).map((a) => (
                 <span key={a} className="px-2.5 py-1 rounded-lg bg-secondary/10 text-secondary text-xs font-bold border border-secondary/20">
-                  {a} yrs
+                  {t("years", { a })}
                 </span>
               ))}
             </div>
@@ -135,12 +112,12 @@ export function ActivityDetail({ activity, open, onClose, isFavorite, onToggleFa
 
           {activity.features?.length > 0 && (
             <div>
-              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">What's here</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">{t("whatsHere")}</p>
               <div className="grid grid-cols-2 gap-1.5">
                 {activity.features.map((f) => (
                   <div key={f} className="flex items-center gap-1.5 text-xs text-foreground/80">
                     <Check className="w-3.5 h-3.5 text-secondary shrink-0" />
-                    {FEATURE_LABELS[f] || f}
+                    {FEATURE_LABELS[f]?.[lang] || f}
                   </div>
                 ))}
               </div>
@@ -158,6 +135,10 @@ export function ActivityDetail({ activity, open, onClose, isFavorite, onToggleFa
                 <ExternalLink className="w-4 h-4" /> Google Maps
               </a>
             </Button>
+          </div>
+
+          <div className="flex justify-end">
+            <SourceTag source={activity.source} />
           </div>
         </div>
       </SheetContent>

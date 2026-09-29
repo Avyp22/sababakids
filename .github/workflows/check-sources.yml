@@ -1,0 +1,30 @@
+# Daily check that every event source (municipal sites + Leaan) still returns events.
+# Municipal websites change their HTML without notice; when a connector breaks,
+# this run fails and GitHub emails the repo owner.
+# Uses the same BACKEND_URL repository variable as keep-alive.yml.
+name: check-event-sources
+
+on:
+  schedule:
+    - cron: "0 5 * * *"   # 05:00 UTC = 08:00 in Israel
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    if: ${{ vars.BACKEND_URL != '' }}
+    steps:
+      - name: Query /api/sources
+        run: |
+          curl -fsS --retry 3 --max-time 120 "${{ vars.BACKEND_URL }}/api/sources?refresh=true" -o sources.json
+          cat sources.json
+          python3 - <<'PY'
+          import json, sys
+          data = json.load(open("sources.json"))
+          broken = [f"{v['name']}: {v.get('error') or 'no events'}"
+                    for v in data.values() if not v.get("ok") or not v.get("count")]
+          if broken:
+              print("::error::Broken event sources -> " + " | ".join(broken))
+              sys.exit(1)
+          print("All event sources OK")
+          PY

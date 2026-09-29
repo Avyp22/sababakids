@@ -12,12 +12,12 @@ import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 import httpx
 
-from mock_data import CITY_COORDS, ACTIVITIES, EVENTS
-from events_source import EVENT_SOURCES, fetch_source, fetch_leaan
+from mock_data import CITY_COORDS, ACTIVITIES
+from events_source import EVENT_SOURCES, SOURCE_NAMES, fetch_many, sources_status
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -393,64 +393,46 @@ def get_events(  # sync: FastAPI runs it in a threadpool so blocking scrapes don
     radius_km: float = Query(50, ge=1, le=200),
     family_only: bool = False,
 ):
-    out = []
-    live_sources = []
-
-    # Pull live municipal event feeds near the search center
+    # Municipal feeds are only queried near their city; Leaan covers the whole country.
+    keys = []
     for src in EVENT_SOURCES:
-        near = True
-        if lat is not None and lng is not None:
-            d = haversine_km(lat, lng, src["center"][0], src["center"][1])
-            near = d <= src["trigger_radius_km"]
-        if near:
-            for ev in fetch_source(src["key"]):
-                item = dict(ev)
-                if lat is not None and lng is not None and item.get("lat") is not None:
-                    d = haversine_km(lat, lng, item["lat"], item["lng"])
-                    if d > radius_km:
-                        continue
-                    item["distance_km"] = round(d, 1)
-                out.append(item)
-            live_sources.append(src["name"])
+        if lat is None or lng is None or haversine_km(lat, lng, *src["center"]) <= src["trigger_radius_km"]:
+            keys.append(src["key"])
+    keys.append("leaan")
+    results = fetch_many(keys)
 
-    # National aggregator (covers all major cities incl. Jerusalem/Tel Aviv/Haifa)
-    national = fetch_leaan()
-    added_national = False
-    for ev in national:
-        item = dict(ev)
-        if lat is not None and lng is not None:
-            if item.get("lat") is None:
-                continue  # skip events we can't place near the user
-            d = haversine_km(lat, lng, item["lat"], item["lng"])
-            if d > radius_km:
+    out, live_sources, seen = [], [], set()
+    for key in keys:
+        added = False
+        for ev in results.get(key, []):
+            item = dict(ev)
+            if lat is not None and lng is not None:
+                if item.get("lat") is None:
+                    continue  # can't place it near the user
+                d = haversine_km(lat, lng, item["lat"], item["lng"])
+                if d > radius_km:
+                    continue
+                item["distance_km"] = round(d, 1)
+            if family_only and not item.get("family"):
                 continue
-            item["distance_km"] = round(d, 1)
-        out.append(item)
-        added_national = True
-    if added_national:
-        live_sources.append("Leaan (national)")
-
-    # Curated fallback events (always available across Israel)
-    today = datetime.now(timezone.utc).date()
-    for e in EVENTS:
-        ev = dict(e)
-        ev_date = today + timedelta(days=ev.pop("day_offset", 0))
-        ev["date"] = ev_date.isoformat()
-        ev["weekday"] = ev_date.strftime("%A")
-        ev["family"] = True
-        ev["source"] = "SababaKids picks"
-        if lat is not None and lng is not None and ev.get("lat") is not None:
-            d = haversine_km(lat, lng, ev["lat"], ev["lng"])
-            if d > radius_km:
+            dedupe = (item["name"].strip(), item["date"])
+            if dedupe in seen:
                 continue
-            ev["distance_km"] = round(d, 1)
-        out.append(ev)
+            seen.add(dedupe)
+            item["weekday"] = datetime.fromisoformat(item["date"]).strftime("%A")
+            out.append(item)
+            added = True
+        if added:
+            live_sources.append(SOURCE_NAMES[key])
 
-    if family_only:
-        out = [e for e in out if e.get("family", True)]
-
-    out.sort(key=lambda x: x["date"])
+    out.sort(key=lambda x: (x["date"], x.get("time") or ""))
     return {"count": len(out), "live_sources": live_sources, "events": out}
+
+
+@api_router.get("/sources")
+def get_sources(refresh: bool = False):
+    """Health of each event connector (used by the daily monitoring workflow)."""
+    return sources_status(refresh=refresh)
 
 
 app.include_router(api_router)

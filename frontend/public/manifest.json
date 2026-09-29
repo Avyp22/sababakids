@@ -1,0 +1,15 @@
+{
+  "name": "SababaKids — activités enfants en Israël",
+  "short_name": "SababaKids",
+  "description": "Kid-friendly places and family events near you in Israel.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FFF8F1",
+  "theme_color": "#E05A47",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

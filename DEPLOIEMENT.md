@@ -61,3 +61,15 @@ cd frontend && yarn install && yarn start   # frontend/.env : REACT_APP_BACKEND_
 - Une recherche identique dans l'heure est servie depuis le cache, sans appel Google.
 - Photos servies par le backend (`/api/photo/...`) : la clé Google n'est plus visible dans le navigateur, et chaque photo est mise en cache 24 h.
 - `GOOGLE_PLACES_DETAIL=basic` (variable Render) supprime notes et horaires → gamme Google moins chère, quota gratuit plus large.
+
+## Sources d'événements
+| Source | Méthode | Filtre « famille » |
+|---|---|---|
+| Mairie de Modi'in | page EventBoard | âges / mots-clés |
+| Mairie de Holon | liste « Havingfun » | champ « public cible » de la mairie |
+| Mairie de Haïfa | page city-events | catégorie « family » de la mairie |
+| Leaan (national) | JSON de la page d'accueil | catégorie « ילדים » du site |
+
+- Non connectables aujourd'hui : Jérusalem (403), Kfar Saba, Herzliya, Bat Yam, Givatayim, Hod Hasharon (anti-bot), Netanya (Cloudflare), Tel Aviv (chargement JavaScript).
+- Ajouter une ville : écrire un `fetch_<ville>()` dans `backend/events_source.py`, l'ajouter à `EVENT_SOURCES` et `FETCHERS`.
+- Santé des sources : `GET /api/sources?refresh=true`. Le workflow `check-event-sources` l'appelle chaque matin et échoue (→ e-mail GitHub) si une source ne renvoie plus rien.

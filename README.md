@@ -1,11 +1,12 @@
 # SababaKids 🧭
 
-Find kid- & family-friendly **activities and events near you in Israel** within a chosen radius — by city/address or GPS. Places come live from **Google Places**; events combine a **national ticketing aggregator (Leaan)**, the **Modi'in municipal board**, and curated picks.
+Find kid- & family-friendly **activities and events near you in Israel** within a chosen radius — by city/address or GPS. Places come live from **Google Places** plus a small curated list of well-known places; events combine a **national ticketing site (Leaan)** and the event boards of the **Modi'in, Holon and Haifa municipalities**. UI in Hebrew (RTL), French and English; installable as a PWA.
 
 ## Tech stack
 - **Frontend**: React (CRA + CRACO) · Tailwind · shadcn/ui · Leaflet maps
 - **Backend**: FastAPI · MongoDB (Motor) · httpx
-- **Data**: Google Places (New) + Geocoding · leaan.co.il · modiin.muni.il
+- **Data**: Google Places (New) + Geocoding · leaan.co.il · modiin.muni.il · holon.muni.il · haifa.muni.il
+- **Monitoring**: `GET /api/sources` + daily GitHub Action `check-event-sources`
 
 ## Repository layout
 ```

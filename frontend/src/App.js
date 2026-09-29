@@ -1,17 +1,14 @@
 import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import Explore from "@/pages/Explore";
+import { useI18n } from "@/lib/i18n";
 
 function App() {
+  const { rtl } = useI18n();
   return (
     <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Explore />} />
-        </Routes>
-      </BrowserRouter>
-      <Toaster position="top-center" richColors />
+      <Explore />
+      <Toaster position="top-center" richColors dir={rtl ? "rtl" : "ltr"} />
     </div>
   );
 }
