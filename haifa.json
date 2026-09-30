@@ -1,6 +1,6 @@
 {
  "source": "haifa",
- "generated_at": "2026-09-30T00:19:19.843884+03:00",
+ "generated_at": "2026-09-30T03:28:26.737096+03:00",
  "events": [
   {
    "id": "haifa-1032826-2026-09-30-",
@@ -688,6 +688,29 @@
    "family": false,
    "description": "בית נגלר",
    "ticket_url": "https://www.haifa.muni.il/event/%d1%81%d0%bf%d0%b5%d0%ba%d1%82%d0%b0%d0%ba%d0%bb%d1%8c-%d0%b6%d0%b5%d0%bd%d0%b8-%d0%b1%d0%b5%d1%80%d0%ba%d0%be%d0%b2%d0%b8%d1%87-%d0%bd%d0%b0%d1%88%d0%b5-%d1%81%d0%be%d0%ba%d1%80%d0%be%d0%b2/",
+   "ics_url": null,
+   "source": "Haifa Municipality",
+   "rtl": true
+  },
+  {
+   "id": "haifa-1386220-2026-12-03-20:30",
+   "name": "מורדות- מחזה ישראלי חדש מאת אמנון לוי",
+   "category": "activity",
+   "venue": "אודיטוריום חיפה",
+   "city": "חיפה",
+   "address": "אודיטוריום חיפה",
+   "lat": 32.794,
+   "lng": 34.9896,
+   "image": "https://www.haifa.muni.il/wp-content/uploads/2026/07/אתר-עירייה-600-420-5-361x227.png",
+   "time": "20:30",
+   "date": "2026-12-03",
+   "end_date": null,
+   "price": null,
+   "price_text": null,
+   "ages": [],
+   "family": false,
+   "description": "אודיטוריום חיפה",
+   "ticket_url": "https://www.haifa.muni.il/event/%d7%9e%d7%95%d7%a8%d7%93%d7%95%d7%aa-%d7%9e%d7%97%d7%96%d7%94-%d7%99%d7%a9%d7%a8%d7%90%d7%9c%d7%99-%d7%97%d7%93%d7%a9-%d7%9e%d7%90%d7%aa-%d7%90%d7%9e%d7%a0%d7%95%d7%9f-%d7%9c%d7%95%d7%99/",
    "ics_url": null,
    "source": "Haifa Municipality",
    "rtl": true
