@@ -17,6 +17,7 @@ import logging
 from datetime import datetime, date, timedelta
 from zoneinfo import ZoneInfo
 from urllib.parse import quote, urljoin
+import threading
 from concurrent.futures import ThreadPoolExecutor
 
 import httpx
@@ -220,10 +221,17 @@ def _clip_dates(start, end, today):
     return max(start, today), end
 
 
-def _get(url):
-    r = httpx.get(url, timeout=25, headers=UA, follow_redirects=True)
-    r.raise_for_status()
-    return r.text
+def _get(url, retries=2):
+    """GET with a short backoff: municipal firewalls sometimes reject a burst."""
+    for attempt in range(retries + 1):
+        try:
+            r = httpx.get(url, timeout=25, headers=UA, follow_redirects=True)
+            r.raise_for_status()
+            return r.text
+        except httpx.HTTPError:
+            if attempt == retries:
+                raise
+            time.sleep(3 * (attempt + 1))
 
 
 # ---------- Modi'in ----------
@@ -524,7 +532,7 @@ def fetch_haifa():
             logger.warning(f"Haifa sub-page failed ({it['name']}): {e}")
             return []
 
-    with ThreadPoolExecutor(max_workers=6) as pool:
+    with ThreadPoolExecutor(max_workers=2) as pool:  # gentle on haifa.muni.il
         for sub in pool.map(expand, long_items.values()):
             events.extend(sub)
     return events
@@ -648,7 +656,15 @@ def geo_key(city, venue):
     return f"{(city or '').strip()}|{(venue or '').strip()}"
 
 
+_GEO_LOCK = threading.Lock()
+
+
 def load_geocache():
+    with _GEO_LOCK:
+        return _load_geocache_locked()
+
+
+def _load_geocache_locked():
     ttl = GEOCACHE_TTL if _GEO["data"] else GEOCACHE_RETRY
     if time.time() - _GEO["ts"] < ttl:
         return _GEO["data"]

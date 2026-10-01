@@ -121,6 +121,8 @@ def main():
 
     if args.geocode:
         for key in args.also_geocode:
+            if key in args.sources:
+                continue  # already fetched above: don't hit the site twice
             try:
                 to_geocode += es.FETCHERS[key]()
             except Exception as e:
