@@ -1,30 +1,7 @@
 {
  "source": "holon",
- "generated_at": "2026-09-30T00:16:38.336691+03:00",
+ "generated_at": "2026-10-01T21:32:08.632388+03:00",
  "events": [
-  {
-   "id": "holon-9069",
-   "name": "חנן הגנן",
-   "category": "show",
-   "venue": "מדיטק חולון - מתחם תרבות יוצר",
-   "city": "חולון",
-   "address": "מדיטק חולון - מתחם תרבות יוצר",
-   "lat": 32.0117,
-   "lng": 34.7745,
-   "image": "https://www.holon.muni.il/Havingfun/DocLib1/Mediatheque/%D7%A4%D7%95%D7%A1%D7%98%D7%A8%20%D7%97%D7%AA%D7%95%D7%9A%20592_811.jpg",
-   "time": "10:30",
-   "date": "2026-09-30",
-   "end_date": null,
-   "price": null,
-   "price_text": null,
-   "ages": [],
-   "family": true,
-   "description": "חנן הגנן על פי ספרה האהוב של רינת הופר הצגה לגילי 3 ומעלה. חנן הגנן מסתובב עם עגלת הפירות שלו ומכריז: \"שסק משמש אפרסמון, קנו פירות באסימון, תפוז, מנגו פירות המון, בתוכם חבוי מטמון\"! סיון הקטנה שומעת אותו ומתמלאת סקרנות: מהו המטמון המסתורי שחנן שר עליו? האם זו תיבת אוצר מלאה מטבעות? או אולי שק מלא אבנים יקרות? חנן נותן לסיון דובדבן ומבטיח לה שהמטמון חבוי בתוכו. \"חנן הגנן, אתה גנן או ליצן? הבטחת מטמ",
-   "ticket_url": "https://mediatheque-theater.org.il/shows/hanan/",
-   "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9069&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20260930T103000&eDateValue=20260930T114000",
-   "source": "Holon Municipality",
-   "rtl": true
-  },
   {
    "id": "holon-9084",
    "name": "אוצר החברות – הצגה חדשה",
@@ -46,7 +23,8 @@
    "ticket_url": "https://mediatheque-theater.org.il/shows/%d7%90%d7%95%d7%a6%d7%a8-%d7%94%d7%97%d7%91%d7%a8%d7%95%d7%aa-%d7%94%d7%a6%d7%92%d7%94-%d7%97%d7%93%d7%a9%d7%94/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9084&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261002T100000&eDateValue=20261002T110000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9093",
@@ -69,7 +47,8 @@
    "ticket_url": "https://mediatheque-theater.org.il/shows/nechama/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9093&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261003T100000&eDateValue=20261003T110000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9178",
@@ -92,7 +71,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%99%d7%9c%d7%93-%d7%a7%d7%98%d7%9f-%d7%94%d7%9c%d7%9a-%d7%9c%d7%92%d7%9f-%d7%a9%d7%a2%d7%aa-%d7%a1%d7%99%d7%a4%d7%95%d7%a8-2/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9178&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261004T170000&eDateValue=20261004T174500",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9179",
@@ -115,7 +95,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%a1%d7%93%d7%a0%d7%aa-%d7%a7%d7%95%d7%9e%d7%99%d7%a7%d7%a1-%d7%9c%d7%91%d7%a0%d7%95%d7%aa/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9179&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261006T163000&eDateValue=20261006T171500",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9095",
@@ -138,7 +119,8 @@
    "ticket_url": "https://mediatheque-theater.org.il/shows/chaparpar/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9095&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261006T170000&eDateValue=20261006T180000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9180",
@@ -161,7 +143,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%94%d7%9e%d7%9e%d7%9c%d7%9b%d7%94-%d7%94%d7%a6%d7%91%d7%a2%d7%95%d7%a0%d7%99%d7%aa-%d7%a9%d7%a2%d7%aa-%d7%a1%d7%99%d7%a4%d7%95%d7%a8-2/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9180&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261006T170000&eDateValue=20261006T174500",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9190",
@@ -184,7 +167,8 @@
    "ticket_url": "https://www.hth.co.il/events/%d7%9e%d7%a0%d7%92%d7%99%d7%a0%d7%95%d7%aa-%d7%94%d7%9c%d7%91-%d7%95%d7%94%d7%a1%d7%90%d7%96/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9190&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261006T193000&eDateValue=20261006T210000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9151",
@@ -207,7 +191,8 @@
    "ticket_url": "https://www.holon.muni.il/Havingfun/Lists/List/CustomDispForm.aspx?ID=9151",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9151&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261007T170000&eDateValue=20261104T193000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9181",
@@ -230,7 +215,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%9e%d7%98%d7%99%d7%99%d7%9c%d7%99%d7%9d-%d7%a2%d7%9d-%d7%a4%d7%a8%d7%a4%d7%a8%d7%99%d7%9d-%d7%a9%d7%a2%d7%aa-%d7%a1%d7%99%d7%a4%d7%95%d7%a8-2/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9181&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261007T170000&eDateValue=20261007T174500",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9182",
@@ -253,7 +239,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%94%d7%a0%d7%a2%d7%9c%d7%99%d7%99%d7%9d-%d7%a9%d7%9c-%d7%98%d7%9e%d7%91%d7%95%d7%a8%d7%99/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9182&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261007T170000&eDateValue=20261007T174500",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9191",
@@ -276,7 +263,8 @@
    "ticket_url": "https://www.hth.co.il/events/%d7%99%d7%95%d7%a0%d7%aa%d7%9f-%d7%91%d7%a8%d7%a7-2/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9191&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261009T220000&eDateValue=20261009T232000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9096",
@@ -299,7 +287,8 @@
    "ticket_url": "https://mediatheque-theater.org.il/shows/ferdinand-the-bull/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9096&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261010T100000&eDateValue=20261010T110000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9073",
@@ -322,7 +311,8 @@
    "ticket_url": "https://mediatheque-theater.org.il/shows/einstein/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9073&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261010T103000&eDateValue=20261010T114000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9183",
@@ -345,7 +335,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%90%d7%95%d7%a8%d7%97-%d7%91%d7%90-%d7%9c%d7%93%d7%91-%d7%a9%d7%a2%d7%aa-%d7%a1%d7%99%d7%a4%d7%95%d7%a8-2/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9183&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261011T170000&eDateValue=20261011T174500",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9185",
@@ -368,7 +359,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%9b%d7%97-%d7%94%d7%a8%d7%a6%d7%95%d7%9f-%d7%a9%d7%a2%d7%aa-%d7%a1%d7%99%d7%a4%d7%95%d7%a8/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9185&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261013T163000&eDateValue=20261013T171500",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9097",
@@ -391,7 +383,8 @@
    "ticket_url": "https://mediatheque-theater.org.il/shows/superhero/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9097&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261013T170000&eDateValue=20261013T180000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9184",
@@ -414,7 +407,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%a1%d7%99%d7%a4%d7%95%d7%a8-%d7%9e%d7%a7%d7%95%d7%a4%d7%9c-%d7%a9%d7%a2%d7%aa-%d7%a1%d7%99%d7%a4%d7%95%d7%a8/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9184&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261013T170000&eDateValue=20261013T174500",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9186",
@@ -437,7 +431,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%94%d7%90%d7%a8%d7%99%d7%94-%d7%94%d7%96%d7%9c%d7%9c%d7%9f-%d7%a9%d7%a2%d7%aa-%d7%a1%d7%99%d7%a4%d7%95%d7%a8-%d7%9c%d7%a7%d7%98%d7%a0%d7%98%d7%a0%d7%99%d7%9d-3/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9186&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261014T170000&eDateValue=20261014T174500",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9192",
@@ -460,7 +455,8 @@
    "ticket_url": "https://www.hth.co.il/events/%d7%94%d7%9c%d7%94%d7%a7%d7%95%d7%aa-%d7%94%d7%a6%d7%91%d7%90%d7%99%d7%95%d7%aa-%d7%97%d7%95%d7%96%d7%a8%d7%95%d7%aa-%d7%94%d7%9e%d7%95%d7%a4%d7%a2-%d7%a9%d7%9b%d7%95%d7%9c%d7%9d-%d7%97/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9192&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261014T203000&eDateValue=20261014T220000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9187",
@@ -483,7 +479,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%98%d7%99%d7%95%d7%9c-%d7%a2%d7%9d-%d7%97%d7%91%d7%a8%d7%99%d7%9d-%d7%a9%d7%a2%d7%aa-%d7%a1%d7%99%d7%a4%d7%95%d7%a8-2/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9187&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261015T170000&eDateValue=20261015T174500",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9193",
@@ -506,7 +503,8 @@
    "ticket_url": "https://www.hth.co.il/events/%d7%9e%d7%a0%d7%99-%d7%a2%d7%95%d7%96%d7%a8%d7%99/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9193&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261015T210000&eDateValue=20261015T222000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9194",
@@ -529,7 +527,8 @@
    "ticket_url": "https://www.hth.co.il/events/21952/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9194&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261017T110000&eDateValue=20261017T123000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9188",
@@ -552,7 +551,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%aa%d7%97%d7%a8%d7%95%d7%aa-%d7%a6%d7%91%d7%a2%d7%99%d7%9d-%d7%a9%d7%a2%d7%aa-%d7%a1%d7%99%d7%a4%d7%95%d7%a8-%d7%9c%d7%a7%d7%98%d7%a0%d7%98%d7%a0%d7%99%d7%9d/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9188&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261018T170000&eDateValue=20261018T174500",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9195",
@@ -575,7 +575,32 @@
    "ticket_url": "https://www.hth.co.il/events/%d7%a2%d7%95%d7%a9%d7%95%d7%aa-%d7%97%d7%99%d7%99%d7%9d-%d7%a6%d7%99%d7%a4%d7%99-%d7%a9%d7%91%d7%99%d7%98-%d7%95%d7%90%d7%95%d7%a8%d7%a0%d7%94-%d7%93%d7%a5/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9195&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261018T203000&eDateValue=20261018T220000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
+  },
+  {
+   "id": "holon-9203",
+   "name": "תפילת הגשם",
+   "category": "show",
+   "venue": "ספרייה תורנית",
+   "city": "חולון",
+   "address": "ספרייה תורנית",
+   "lat": 32.0117,
+   "lng": 34.7745,
+   "image": "https://www.holon.muni.il/Havingfun/DocLib1/Library/%D7%9E%D7%A0%D7%99%D7%94%20%D7%94%D7%9C%D7%9C%2C%20%D7%AA%D7%A4%D7%99%D7%9C%D7%AA%20%D7%94%D7%92%D7%A9%D7%9D%2C%20%D7%A6%D7%99%D7%9C%D7%95%D7%9D%20%D7%A2%D7%A6%D7%9E%D7%99.png",
+   "time": "16:30",
+   "date": "2026-10-20",
+   "end_date": null,
+   "price": null,
+   "price_text": null,
+   "ages": [],
+   "family": true,
+   "description": "מני-ה הלל עם הסיפור תפילת הגשם , אגדות חז\"ל בארץ ישראל הייתה שנת בצורת ולא ירדו גשמים. נגלה את כוחה ועוצמתה של תפילת הצדיק שבזכותה ירד השפע. פרטים נוספים שעת הסיפור תתקיים בספרייה התורנית מיועד לגילי 7-4 לא תתאפשר כניסה לילדים מתחת לגיל 3 ועגלות",
+   "ticket_url": "https://main-library.org.il/events/%d7%aa%d7%a4%d7%99%d7%9c%d7%aa-%d7%94%d7%92%d7%a9%d7%9d-%d7%a9%d7%a2%d7%aa-%d7%a1%d7%99%d7%a4%d7%95%d7%a8/",
+   "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9203&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261020T163000&eDateValue=20261020T171500",
+   "source": "Holon Municipality",
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9189",
@@ -598,7 +623,56 @@
    "ticket_url": "https://main-library.org.il/events/%d7%94%d7%9b%d7%9c%d7%91%d7%9c%d7%91-%d7%94%d7%a9%d7%95%d7%91%d7%91-%d7%a9%d7%a2%d7%aa-%d7%a1%d7%99%d7%a4%d7%95%d7%a8-%d7%9c%d7%a7%d7%98%d7%a0%d7%98%d7%a0%d7%99%d7%9d/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9189&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261020T170000&eDateValue=20261020T174000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
+  },
+  {
+   "id": "holon-9204",
+   "name": "משחק בדרמה",
+   "category": "show",
+   "venue": "ספרייה תורנית",
+   "city": "חולון",
+   "address": "ספרייה תורנית",
+   "lat": 32.0117,
+   "lng": 34.7745,
+   "image": "https://www.holon.muni.il/Havingfun/DocLib1/Library/%D7%9E%D7%A0%D7%99%D7%94%20%D7%94%D7%9C%D7%9C%2C%20%D7%A1%D7%93%D7%A0%D7%AA%20%D7%93%D7%A8%D7%9E%D7%94%2C%20%D7%A6%D7%99%D7%9C%D7%95%D7%9D%20%D7%A2%D7%A6%D7%9E%D7%99.png",
+   "time": "17:30",
+   "date": "2026-10-20",
+   "end_date": null,
+   "price": null,
+   "price_text": null,
+   "ages": [],
+   "family": true,
+   "description": "מני-ה הלל עם ההצגה משחק בדרמה הצגה שבה הבנות שותפות ויוצרות עם המפעילה מני-ה הלל: עם דמויות מהתנ\"ך ומאגדות ח ז\"ל פרטים נוספים שע ת הסיפור תתקיים בספרייה התורנית מיועד לבנות בגילי 11-8 לא תתאפשר כניסה לילדים מתחת לגיל 3 ועגלות",
+   "ticket_url": "https://main-library.org.il/events/%d7%9e%d7%a9%d7%97%d7%a7-%d7%91%d7%93%d7%a8%d7%9e%d7%94-%d7%94%d7%a6%d7%92%d7%94/",
+   "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9204&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261020T173000&eDateValue=20261020T181500",
+   "source": "Holon Municipality",
+   "rtl": true,
+   "approx": true
+  },
+  {
+   "id": "holon-9205",
+   "name": "החלילן מהמלין",
+   "category": "show",
+   "venue": "ספריית נבון",
+   "city": "חולון",
+   "address": "ספריית נבון",
+   "lat": 32.0117,
+   "lng": 34.7745,
+   "image": "https://www.holon.muni.il/Havingfun/DocLib1/Library/%D7%A9%D7%A8%D7%9C%D7%99%20%D7%93%D7%A0%D7%99%D7%A0%D7%95%2C%20%D7%A6%D7%99%D7%9C%D7%95%D7%9D%20%D7%9C%D7%99%D7%91%20%D7%93%D7%A0%D7%99%D7%A0%D7%95.jpg",
+   "time": "17:00",
+   "date": "2026-10-21",
+   "end_date": null,
+   "price": null,
+   "price_text": null,
+   "ages": [],
+   "family": true,
+   "description": "שרלי דנינו עם הסיפור החלילן מהמלין , עפ\"י רוברט בראונינג המלין מוכת העכברים מחפשת פתרונים. מי יציל את העיר ממכת העכברים? תיאטרון סיפור תוסס ושמח בשי תוף הקהל פרטים נוספים שעת הסיפור תתקיים בספריית נבון מיועד לגילי 3 ומעלה לא תתאפשר כניסה לילדים מתחת לגיל 3 ועגלות",
+   "ticket_url": "https://main-library.org.il/events/%d7%94%d7%97%d7%9c%d7%99%d7%9c%d7%9f-%d7%9e%d7%94%d7%9e%d7%9c%d7%99%d7%9f-%d7%a9%d7%a2%d7%aa-%d7%a1%d7%99%d7%a4%d7%95%d7%a8-2/",
+   "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9205&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261021T170000&eDateValue=20261021T174500",
+   "source": "Holon Municipality",
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9072",
@@ -621,7 +695,8 @@
    "ticket_url": "https://mediatheque-theater.org.il/shows/%d7%94%d7%9e%d7%9e%d7%9c%d7%9b%d7%94-%d7%94%d7%a7%d7%98%d7%a0%d7%98%d7%a0%d7%94/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9072&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261024T103000&eDateValue=20261024T114000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9196",
@@ -644,7 +719,8 @@
    "ticket_url": "https://www.hth.co.il/events/%d7%94%d7%a1%d7%99%d7%a0%d7%95%d7%a8-%d7%a9%d7%9c-%d7%a8%d7%95%d7%a0%d7%99/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9196&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261024T110000&eDateValue=20261024T120000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9197",
@@ -667,7 +743,8 @@
    "ticket_url": "https://www.hth.co.il/events/21597/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9197&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261024T210000&eDateValue=20261024T223000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9198",
@@ -690,7 +767,80 @@
    "ticket_url": "https://www.hth.co.il/events/%d7%94%d7%a4%d7%95%d7%92%d7%aa-%d7%96%d7%9e%d7%a8-%d7%91%d7%91%d7%95%d7%a7%d7%a8-%d7%94%d7%96%d7%9e%d7%a8-%d7%99%d7%94%d7%95%d7%93%d7%94-%d7%90%d7%9c%d7%99%d7%90%d7%a1-2/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9198&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261026T110000&eDateValue=20261026T123000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
+  },
+  {
+   "id": "holon-9206",
+   "name": "הדייג ודג הזהב",
+   "category": "show",
+   "venue": "ספריית נבון",
+   "city": "חולון",
+   "address": "ספריית נבון",
+   "lat": 32.0117,
+   "lng": 34.7745,
+   "image": "https://www.holon.muni.il/Havingfun/DocLib1/Library/%D7%99%D7%A4%D7%A2%D7%AA%20%D7%A0%D7%AA%D7%99%D7%912%2C%20%D7%A6%D7%99%D7%9C%D7%95%D7%9D%20%D7%A2%D7%A6%D7%9E%D7%99.jpg",
+   "time": "17:00",
+   "date": "2026-10-28",
+   "end_date": null,
+   "price": null,
+   "price_text": null,
+   "ages": [],
+   "family": true,
+   "description": "יפעת מתיאטרון \"חוויה בעקבות סיפור\" עם הדייג ודג הזהב , אגדת עם דייג מצליח לתפוס דג זהב שמבטיח למלא את כל משאלותיו. אך מה קורה כשמבקשים יותר מדי? פרטים נוספים שעת הסיפור תתקיים בספריית נבון מיועד לגילי 3 ומעלה לא תתאפשר כניסה לילדים מתחת לגיל 3 ועגלות",
+   "ticket_url": "https://main-library.org.il/events/%d7%94%d7%93%d7%99%d7%99%d7%92-%d7%95%d7%93%d7%92-%d7%94%d7%96%d7%94%d7%91-%d7%a9%d7%a2%d7%aa-%d7%a1%d7%99%d7%a4%d7%95%d7%a8-2/",
+   "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9206&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261028T170000&eDateValue=20261028T174500",
+   "source": "Holon Municipality",
+   "rtl": true,
+   "approx": true
+  },
+  {
+   "id": "holon-9207",
+   "name": "שבלול יוצא לטיול",
+   "category": "show",
+   "venue": "ספריית קריית שרת",
+   "city": "חולון",
+   "address": "ספריית קריית שרת",
+   "lat": 32.0117,
+   "lng": 34.7745,
+   "image": "https://www.holon.muni.il/Havingfun/DocLib1/Library/%D7%AA%D7%99%D7%90%D7%98%D7%A8%D7%95%D7%9F%20%D7%9E%D7%A1%D7%A4%D7%A8%D7%99%D7%9D%20%D7%A2%D7%9D%20%D7%A9%D7%A8%D7%99%2C%20%D7%A9%D7%91%D7%9C%D7%95%D7%9C%20%D7%99%D7%95%D7%A6%D7%90%20%D7%9C%D7%98%D7%99%D7%95%D7%9C%2C%20%D7%A6%D7%99%D7%9C%D7%95%D7%9D%20%D7%A2%D7%A6%D7%9E%D7%99.jpg",
+   "time": "17:00",
+   "date": "2026-10-28",
+   "end_date": null,
+   "price": null,
+   "price_text": null,
+   "ages": [],
+   "family": true,
+   "description": "תיאטרון \"מספרים עם שרי\" עם הסיפור שבלול יוצא לטיול , בהשראת: \"לולי שבלולי יוצא לטיל\" מאת: קורה גלעדי ביום סתיו יוצא לולי שבלולי מביתו לטיול אך הטיול משתבש בעקבות גשם לא צפוי , האם לולי שבלולי יוותר על הטיול האהוב? פרטים נוספים שעת הסיפור תתקיים בספריית קרית שרת מיועד לגילי 3 ומעלה לא תתאפשר כניסה לילדים מתחת לגיל 3 ועגלות",
+   "ticket_url": "https://main-library.org.il/events/%d7%a9%d7%91%d7%9c%d7%95%d7%9c-%d7%99%d7%95%d7%a6%d7%90-%d7%9c%d7%98%d7%99%d7%95%d7%9c-%d7%a9%d7%a2%d7%aa-%d7%a1%d7%99%d7%a4%d7%95%d7%a8/",
+   "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9207&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261028T170000&eDateValue=20261028T174500",
+   "source": "Holon Municipality",
+   "rtl": true,
+   "approx": true
+  },
+  {
+   "id": "holon-9208",
+   "name": "יום הולדת לחמור אִיָה",
+   "category": "show",
+   "venue": "ספריית קליין (תל גיבורים)",
+   "city": "חולון",
+   "address": "ספריית קליין (תל גיבורים)",
+   "lat": 32.0117,
+   "lng": 34.7745,
+   "image": "https://www.holon.muni.il/Havingfun/DocLib1/Library/%D7%AA%D7%99%D7%90%D7%98%D7%A8%D7%95%D7%9F%20%D7%91%D7%90%D7%9E%D7%91%D7%95%D7%9C%D7%94%2C%20%D7%99%D7%95%D7%9D%20%D7%94%D7%95%D7%9C%D7%93%D7%AA%20%D7%9C%D7%97%D7%9E%D7%95%D7%A8%20%D7%90%D7%99%D7%94%2C%20%D7%A6%D7%99%D7%9C%D7%95%D7%9D%20%D7%A2%D7%A6%D7%9E%D7%99.JPG",
+   "time": "17:00",
+   "date": "2026-10-29",
+   "end_date": null,
+   "price": null,
+   "price_text": null,
+   "ages": [],
+   "family": false,
+   "description": "'תיאטרון באמבולה' עם הסיפור יום הולדת לחמור אִיָה עיבוד לפו הדב מאת: א.א. מילן פו הדוב, חזרזיר, ינשוף וארנב שוכחים את יום הולדתו של החמור אִיָה. מה יעשו? איך יחגגו? והאם אִיָה יפסיק להיות עצוב ליום אחד? פרטים נוספים שעת הסיפור תתקיים בספריית קליין (תל גיבורים) מיועד לגילי 3 ומעלה לא תתאפשר כניסה לילדים מתחת לגיל 3 ועגלות",
+   "ticket_url": "https://main-library.org.il/events/%d7%99%d7%95%d7%9d-%d7%94%d7%95%d7%9c%d7%93%d7%aa-%d7%9c%d7%97%d7%9e%d7%95%d7%a8-%d7%90%d6%b4%d7%99%d6%b8%d7%94-%d7%a9%d7%a2%d7%aa-%d7%a1%d7%99%d7%a4%d7%95%d7%a8-2/",
+   "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9208&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261029T170000&eDateValue=20261029T174500",
+   "source": "Holon Municipality",
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9199",
@@ -713,7 +863,8 @@
    "ticket_url": "https://www.hth.co.il/events/voca-people/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9199&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261029T200000&eDateValue=20261029T213000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9200",
@@ -736,7 +887,8 @@
    "ticket_url": "https://www.hth.co.il/events/%d7%92%d7%99%d7%95%d7%a8%d7%90-%d7%96%d7%99%d7%a0%d7%92%d7%a8/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9200&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261030T220000&eDateValue=20261030T231500",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9201",
@@ -759,7 +911,104 @@
    "ticket_url": "https://www.hth.co.il/events/%d7%94%d7%93%d7%a8%d7%93%d7%a1%d7%99%d7%9d-%d7%94%d7%94%d7%a6%d7%92%d7%94-live-%d7%a2%d7%9c-%d7%94%d7%91%d7%9e%d7%94/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9201&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261031T100000&eDateValue=20261031T113000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
+  },
+  {
+   "id": "holon-9202",
+   "name": "אור לגויים – תיאטרון בית לסין",
+   "category": "show",
+   "venue": "תיאטרון חולון",
+   "city": "חולון",
+   "address": "תיאטרון חולון",
+   "lat": 32.0117,
+   "lng": 34.7745,
+   "image": "https://www.holon.muni.il/Havingfun/DocLib1/HolonTheater/%D7%9C%D7%9C%D7%90%20%D7%A9%D7%9D%20%28400%20x%20400%20%D7%A4%D7%99%D7%A7%D7%A1%D7%9C%29%20%2829%29.jpg?Height=250",
+   "time": "20:30",
+   "date": "2026-11-01",
+   "end_date": null,
+   "price": null,
+   "price_text": null,
+   "ages": [],
+   "family": false,
+   "description": "אור לגויים – תיאטרון בית לסין קומדיה על אובדן זהות | בכיכובו של אבי קושניר מאת: דניאל לפין | בימוי: תמר קינן לאחר פטירתה בשיבה טובה של אמו, מתברר לאור אאוסלנדר, מורה לספרות, כמעט במקרה שהיא לא היתה יהודיה. מה שמתפרש בתחילה כטעות ביוקרטית, הופך עד מהרה לעובדה שמערערת את יסודות משפחתו וחייו. האם מסתתר איזה סוד כמוס בעברה של אמו, או שבכלל מדובר כאן בטעות? אור יוצא למסע מוטרף שמתחיל בפקיד של רבנות ומג",
+   "ticket_url": "https://www.hth.co.il/events/%d7%90%d7%95%d7%a8-%d7%9c%d7%92%d7%95%d7%99%d7%99%d7%9d-%d7%aa%d7%99%d7%90%d7%98%d7%a8%d7%95%d7%9f-%d7%91%d7%99%d7%aa-%d7%9c%d7%a1%d7%99%d7%9f/",
+   "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9202&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261101T203000&eDateValue=20261101T223500",
+   "source": "Holon Municipality",
+   "rtl": true,
+   "approx": true
+  },
+  {
+   "id": "holon-9209",
+   "name": "אור לגויים – תיאטרון בית לסין",
+   "category": "show",
+   "venue": "תיאטרון חולון",
+   "city": "חולון",
+   "address": "תיאטרון חולון",
+   "lat": 32.0117,
+   "lng": 34.7745,
+   "image": "https://www.holon.muni.il/Havingfun/DocLib1/HolonTheater/%D7%9C%D7%9C%D7%90%20%D7%A9%D7%9D%20%28400%20x%20400%20%D7%A4%D7%99%D7%A7%D7%A1%D7%9C%29%20%2829%29.jpg?Height=250",
+   "time": "11:00",
+   "date": "2026-11-03",
+   "end_date": null,
+   "price": null,
+   "price_text": null,
+   "ages": [],
+   "family": false,
+   "description": "פרטים נוספים לפרטים נוספים ורכישה לחצו כאן",
+   "ticket_url": "https://www.hth.co.il/events/%d7%90%d7%95%d7%a8-%d7%9c%d7%92%d7%95%d7%99%d7%99%d7%9d-%d7%aa%d7%99%d7%90%d7%98%d7%a8%d7%95%d7%9f-%d7%91%d7%99%d7%aa-%d7%9c%d7%a1%d7%99%d7%9f-3/",
+   "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9209&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261103T110000&eDateValue=20261103T123000",
+   "source": "Holon Municipality",
+   "rtl": true,
+   "approx": true
+  },
+  {
+   "id": "holon-9210",
+   "name": "אור לגויים – תיאטרון בית לסין",
+   "category": "show",
+   "venue": "תיאטרון חולון",
+   "city": "חולון",
+   "address": "תיאטרון חולון",
+   "lat": 32.0117,
+   "lng": 34.7745,
+   "image": "https://www.holon.muni.il/Havingfun/DocLib1/HolonTheater/%D7%9C%D7%9C%D7%90%20%D7%A9%D7%9D%20%28400%20x%20400%20%D7%A4%D7%99%D7%A7%D7%A1%D7%9C%29%20%2829%29.jpg?Height=250",
+   "time": "20:30",
+   "date": "2026-11-03",
+   "end_date": null,
+   "price": null,
+   "price_text": null,
+   "ages": [],
+   "family": false,
+   "description": "או ר לגויים – תיאטרון בית לסין קומדיה על אובדן זהות | בכיכובו של אבי קושניר מאת: דניאל לפין | בימוי: תמר קינן לאחר פטירתה בשיבה טובה של אמו, מתברר לאור אאוסלנדר, מורה לספרות, כמעט במקרה שהיא לא היתה יהודיה. מה שמתפרש בתחילה כטעות ביוקרטית, הופך עד מהרה לעובדה שמערערת את יסודות משפחתו וחייו. האם מסתתר איזה סוד כמוס בעברה של אמו, או שבכלל מדובר כאן בטעות? אור יוצא למסע מוטרף שמתחיל בפקיד של רבנות ומ",
+   "ticket_url": "https://www.hth.co.il/events/%d7%90%d7%95%d7%a8-%d7%9c%d7%92%d7%95%d7%99%d7%99%d7%9d-%d7%aa%d7%99%d7%90%d7%98%d7%a8%d7%95%d7%9f-%d7%91%d7%99%d7%aa-%d7%9c%d7%a1%d7%99%d7%9f-2/",
+   "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9210&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261103T203000&eDateValue=20261103T220000",
+   "source": "Holon Municipality",
+   "rtl": true,
+   "approx": true
+  },
+  {
+   "id": "holon-9211",
+   "name": "זוגות בזיגזג",
+   "category": "show",
+   "venue": "תיאטרון חולון",
+   "city": "חולון",
+   "address": "תיאטרון חולון",
+   "lat": 32.0117,
+   "lng": 34.7745,
+   "image": "https://www.holon.muni.il/Havingfun/DocLib1/HolonTheater/%D7%9C%D7%9C%D7%90%20%D7%A9%D7%9D%20%28500%20x%20375%20%D7%A4%D7%99%D7%A7%D7%A1%D7%9C%29%20%28400%20x%20400%20%D7%A4%D7%99%D7%A7%D7%A1%D7%9C%29%20%2898%29.jpg?Height=250",
+   "time": "21:00",
+   "date": "2026-11-06",
+   "end_date": null,
+   "price": null,
+   "price_text": null,
+   "ages": [],
+   "family": false,
+   "description": "זוגות בזיגז ג שחקנים: מיה דגן/שיפי אלוני, יניב פולישוק, יפית אסולין, יובל סגל, טלי בן יוסף שורוש, דן קיזלר. קומדיה בקצב גבוה ! התכנית של דניאל הייתה מושלמת, כשאשתו יוצאת לסוף שבוע לבקר את אמא שלה הוא יהיה בבית בסוף שבוע סודי יחד עם המאהבת שלו כולל שפית פרטית שאמורה לדאוג לארוחות גורמה ואווירה יוקרתית. מה כבר יכול להשתבש ? הכל ! אשתו לא הולכת , אורחים לא צפויים מגיעים, זהויות מתבלבלות והעניינים הול",
+   "ticket_url": "https://www.hth.co.il/events/%d7%96%d7%95%d7%92%d7%95%d7%aa-%d7%91%d7%96%d7%99%d7%92%d7%96%d7%92/",
+   "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9211&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261106T210000&eDateValue=20261106T222000",
+   "source": "Holon Municipality",
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9171",
@@ -782,7 +1031,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%a0%d7%a4%d7%9c%d7%90%d7%95%d7%aa-%d7%94%d7%92%d7%a0%d7%98%d7%99%d7%a7%d7%94-%d7%94%d7%90%d7%a0%d7%95%d7%a9%d7%99%d7%aa-6/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9171&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261130T110000&eDateValue=20261130T123000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9163",
@@ -805,7 +1055,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%9e%d7%95%d7%a2%d7%93%d7%95%d7%9f-%d7%94%d7%a1%d7%a8%d7%98-%d7%94%d7%98%d7%95%d7%91-5/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9163&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261215T093000&eDateValue=20261215T130000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9158",
@@ -828,7 +1079,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%9c%d7%99%d7%a7%d7%95%d7%98%d7%99%d7%95-%d7%a9%d7%9c-%d7%a9%d7%99-%d7%a2%d7%92%d7%a0%d7%95%d7%9f/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9158&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261227T190000&eDateValue=20261227T203000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9167",
@@ -851,7 +1103,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%9e%d7%93%d7%91%d7%a8%d7%99%d7%9d-%d7%94%d7%95%d7%a8%d7%95%d7%aa-2/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9167&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20261228T200000&eDateValue=20270201T210000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9159",
@@ -874,7 +1127,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%97%d7%a6%d7%99-%d7%94%d7%9b%d7%95%d7%a1-%d7%94%d7%a9%d7%91%d7%95%d7%a8%d7%94/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9159&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20270106T190000&eDateValue=20270106T203000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9161",
@@ -897,7 +1151,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%94%d7%9e%d7%a1%d7%a2-%d7%94%d7%9e%d7%a8%d7%aa%d7%a7-%d7%90%d7%9c-%d7%94%d7%97%d7%95%d7%a4%d7%a9/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9161&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20270307T200000&eDateValue=20270307T213000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   },
   {
    "id": "holon-9152",
@@ -920,7 +1175,8 @@
    "ticket_url": "https://main-library.org.il/events/%d7%a1%d7%99%d7%a4%d7%95%d7%a8%d7%99%d7%9d-%d7%9e%d7%90%d7%97%d7%95%d7%a8%d7%99-%d7%94%d7%a7%d7%9c%d7%a2%d7%99%d7%9d-%d7%a9%d7%9c-%d7%a2%d7%95%d7%9c%d7%9d-%d7%94%d7%a4%d7%a9%d7%a2-%d7%94%d7%99%d7%a9/",
    "ics_url": "https://www.holon.muni.il/_layouts/CreateICSFile.aspx?listID=4088beee-d9a3-4bbe-81fa-3bf4e4e1bf2f&webURL=/Havingfun&itemID=9152&descriptionField=&locationField=_x05de__x05d9__x05e7__x05d5__x05&isRecurrence=false&useItemUrl=true&sDateValue=20270405T190000&eDateValue=20270405T203000",
    "source": "Holon Municipality",
-   "rtl": true
+   "rtl": true,
+   "approx": true
   }
  ]
 }
