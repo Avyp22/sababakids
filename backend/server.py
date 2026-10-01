@@ -384,8 +384,19 @@ async def root():
 
 
 @api_router.get("/health")
-async def health():
-    return {"status": "ok"}
+async def health(deep: bool = False):
+    if not deep:
+        return {"status": "ok"}
+    # Database check, without leaking the connection string.
+    if db is None:
+        return {"status": "ok", "db": "not configured"}
+    try:
+        await db.command("ping")
+        return {"status": "ok", "db": "ok"}
+    except Exception as e:
+        msg = re.sub(r"mongodb(\+srv)?://\S+", "<url>", str(e))
+        msg = re.sub(r"[\w.-]+\.mongodb\.net", "<host>", msg)
+        return {"status": "ok", "db": f"error: {type(e).__name__}: {msg[:200]}"}
 
 
 @api_router.get("/photo/{name:path}")
