@@ -20,9 +20,15 @@ jobs:
           cat sources.json
           python3 - <<'PY'
           import json, sys
+          from datetime import datetime, timezone, timedelta
           data = json.load(open("sources.json"))
           broken = [f"{v['name']}: {v.get('error') or 'no events'}"
                     for v in data.values() if not v.get("ok") or not v.get("count")]
+          # Snapshots (Holon from a computer in Israel, Haifa from GitHub) must stay fresh.
+          for v in data.values():
+              at = v.get("snapshot_at")
+              if at and datetime.now(timezone.utc) - datetime.fromisoformat(at) > timedelta(days=3):
+                  broken.append(f"{v['name']}: snapshot not refreshed since {at[:10]}")
           if broken:
               print("::error::Broken event sources -> " + " | ".join(broken))
               sys.exit(1)

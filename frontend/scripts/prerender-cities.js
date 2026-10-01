@@ -22,7 +22,7 @@ function cityPage(c) {
     `פארקים, חופים, מוזיאונים, מעיינות, הצגות ואירועים לילדים ב${c.he} ובסביבה. ` +
     `Parcs, plages, musées, spectacles et événements pour enfants à ${c.fr}. ` +
     `Kids activities and family events in ${c.en}.`;
-  const url = `${SITE}/${c.slug}`;
+  const url = `${SITE}/${c.slug}/`;
   const body =
     `<div id="root"><main style="max-width:720px;margin:40px auto;padding:0 16px;font-family:sans-serif">` +
     `<h1>${esc(`פעילויות לילדים ב${c.he}`)}</h1>` +
@@ -30,7 +30,7 @@ function cityPage(c) {
     `<ul><li>${esc("פארקים וגני שעשועים")}</li><li>${esc("חופים ופארקי מים")}</li>` +
     `<li>${esc("מוזיאונים, גני חיות ואקווריומים")}</li><li>${esc("טבע ומעיינות")}</li>` +
     `<li>${esc("הצגות ילדים ואירועים עירוניים")}</li></ul>` +
-    `<nav>${cities.filter((o) => o.slug !== c.slug).map((o) => `<a href="/${o.slug}">${esc(o.he)}</a>`).join(" · ")}</nav>` +
+    `<nav>${cities.filter((o) => o.slug !== c.slug).map((o) => `<a href="/${o.slug}/">${esc(o.he)}</a>`).join(" · ")}</nav>` +
     `</main></div>`;
 
   return template
@@ -50,7 +50,7 @@ for (const c of cities) {
 }
 
 const today = new Date().toISOString().slice(0, 10);
-const urls = [`${SITE}/`, ...cities.map((c) => `${SITE}/${c.slug}`)];
+const urls = [`${SITE}/`, ...cities.map((c) => `${SITE}/${c.slug}/`)];
 fs.writeFileSync(
   path.join(BUILD, "sitemap.xml"),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +

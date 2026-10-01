@@ -620,9 +620,11 @@ def fetch_snapshot(key):
     generated = datetime.fromisoformat(payload["generated_at"])
     if datetime.now(TZ) - generated > timedelta(days=SNAPSHOT_MAX_AGE_DAYS):
         raise RuntimeError(f"snapshot too old ({payload['generated_at']})")
+    _SNAPSHOT_AT[key] = payload["generated_at"]
     today = datetime.now(TZ).date()
     events = []
     for ev in payload["events"]:
+        ev = {"approx": True, **ev}
         end = date.fromisoformat(ev.get("end_date") or ev["date"])
         if end < today:
             continue
@@ -638,6 +640,8 @@ def fetch_snapshot(key):
 # Applying it turns city-centre coordinates into the venue's real position.
 _GEO = {"ts": 0.0, "data": {}}
 GEOCACHE_TTL = 6 * 3600
+GEOCACHE_RETRY = 10 * 60   # after a failed download, retry soon (not in 6 h)
+_SNAPSHOT_AT = {}          # key -> generated_at of the snapshot in use
 
 
 def geo_key(city, venue):
@@ -645,7 +649,8 @@ def geo_key(city, venue):
 
 
 def load_geocache():
-    if time.time() - _GEO["ts"] < GEOCACHE_TTL:
+    ttl = GEOCACHE_TTL if _GEO["data"] else GEOCACHE_RETRY
+    if time.time() - _GEO["ts"] < ttl:
         return _GEO["data"]
     _GEO["ts"] = time.time()
     try:
@@ -680,7 +685,10 @@ def fetch_source(key):
         events = apply_geocache(events)
         _CACHE[key] = (time.time(), events)
         _STATUS[key] = {"ok": True, "count": len(events), "at": datetime.now(TZ).isoformat(),
-                        "via": "snapshot" if use_snapshot else "direct"}
+                        "via": "snapshot" if use_snapshot else "direct",
+                        "precise": sum(not e.get("approx") for e in events)}
+        if use_snapshot:
+            _STATUS[key]["snapshot_at"] = _SNAPSHOT_AT.get(key)
         return events
     except Exception as e:
         logger.warning(f"Event source '{key}' failed: {e}")
@@ -700,5 +708,7 @@ def fetch_many(keys):
 
 def sources_status(refresh=False):
     if refresh:
+        _CACHE.clear()
+        _GEO["ts"] = 0.0
         fetch_many(FETCHERS.keys())
     return {k: {"name": SOURCE_NAMES[k], **_STATUS.get(k, {"ok": None, "count": 0})} for k in FETCHERS}
