@@ -1,4 +1,13 @@
 {
- "at": "2026-10-01T21:53:11.517500+03:00",
- "sources": {}
+ "at": "2026-10-01T21:56:15.152643+03:00",
+ "sources": {
+  "haifa": {
+   "ok": true,
+   "count": 181
+  },
+  "holon": {
+   "ok": false,
+   "error": "ConnectTimeout: timed out"
+  }
+ }
 }
