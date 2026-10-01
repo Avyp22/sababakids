@@ -49,6 +49,8 @@ jobs:
       # Also geocodes venues (OpenStreetMap, 1 req/s): the first run takes a few minutes.
       - name: Fetch snapshots + geocode venues
         working-directory: backend
+        env:
+          SNAPSHOT_RUNNER: github
         run: python snapshot_events.py --out ../data --geocode --also-geocode leaan modiin haifa holon || echo "some sources failed"
 
       - name: Publish

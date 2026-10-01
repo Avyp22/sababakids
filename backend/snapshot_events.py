@@ -19,6 +19,7 @@ venue instead of the city centre.
 import argparse
 import json
 import math
+import os
 import re
 import sys
 import time
@@ -104,15 +105,19 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     ok = 0
     to_geocode = []
+    status = {}
     for key in args.sources:
         try:
             events = es.FETCHERS[key]()
         except Exception as e:
             print(f"{key}: FAILED ({type(e).__name__}: {e})")
+            status[key] = {"ok": False, "error": f"{type(e).__name__}: {e}"[:300]}
             continue
         if not events:
             print(f"{key}: 0 events, keeping previous snapshot")
+            status[key] = {"ok": False, "error": "0 events"}
             continue
+        status[key] = {"ok": True, "count": len(events)}
         payload = {"source": key, "generated_at": datetime.now(es.TZ).isoformat(), "events": events}
         (out / f"{key}.json").write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
         print(f"{key}: {len(events)} events")
@@ -135,6 +140,10 @@ def main():
         print(f"geocache: {sum('lat' in v for v in cache.values())} venues located "
               f"(+{sum('lat' in v for v in cache.values()) - before}), {used} lookups")
         ok += 1
+    # Per-runner run report (GitHub Action vs a computer in Israel), readable on the branch.
+    runner = os.environ.get("SNAPSHOT_RUNNER", "local")
+    (out / f"status-{runner}.json").write_text(json.dumps(
+        {"at": datetime.now(es.TZ).isoformat(), "sources": status}, ensure_ascii=False, indent=1), encoding="utf-8")
     return 0 if ok else 1
 
 
