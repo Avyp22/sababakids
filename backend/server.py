@@ -5,6 +5,8 @@ from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import re
+import json
+import hashlib
 import time
 import asyncio
 import math
@@ -12,7 +14,7 @@ import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from zoneinfo import ZoneInfo
 import httpx
 
@@ -136,6 +138,52 @@ def cache_put(cache, key, value, max_items=1000):
         cache.pop(next(iter(cache)))
     cache[key] = (time.time(), value)
 
+
+class Cache:
+    """Memory cache backed by MongoDB (when MONGO_URL is set) so Google results
+    survive Render restarts and free-tier sleeps."""
+
+    def __init__(self, name, ttl, store, max_items=1000):
+        self.name, self.ttl, self.mem, self.max = name, ttl, store, max_items
+
+    @staticmethod
+    def _key(key):
+        return key if isinstance(key, str) else json.dumps(key, ensure_ascii=False, default=str)
+
+    async def get(self, key):
+        k = self._key(key)
+        value = cache_get(self.mem, k, self.ttl)
+        if value is not None or db is None:
+            return value
+        try:
+            doc = await db.cache.find_one({"_id": f"{self.name}:{k}"})
+        except Exception as e:
+            logger.warning(f"Mongo cache read failed: {e}")
+            return None
+        if doc and time.time() - doc["ts"] < self.ttl:
+            cache_put(self.mem, k, doc["v"], self.max)
+            return doc["v"]
+        return None
+
+    async def put(self, key, value):
+        k = self._key(key)
+        cache_put(self.mem, k, value, self.max)
+        if db is None:
+            return
+        try:
+            await db.cache.update_one(
+                {"_id": f"{self.name}:{k}"},
+                {"$set": {"v": value, "ts": time.time(),
+                          "expires": datetime.now(timezone.utc) + timedelta(seconds=self.ttl)}},
+                upsert=True)
+        except Exception as e:
+            logger.warning(f"Mongo cache write failed: {e}")
+
+
+places_cache = Cache("places", CACHE_TTL_S, _places_cache)
+photo_cache = Cache("photo", PHOTO_CACHE_TTL_S, _photo_cache, max_items=5000)
+geocode_cache = Cache("geocode", 30 * 86400, _geocode_cache)
+
 INDOOR_CATEGORIES = {"museum", "aquarium", "indoor_play"}
 
 
@@ -175,9 +223,9 @@ async def geocode(req: SearchRequest):
         if city in key:
             return coords[0], coords[1], text
 
-    cached = cache_get(_geocode_cache, key, 30 * 86400)
+    cached = await geocode_cache.get(key)
     if cached:
-        return cached
+        return tuple(cached)
 
     if GOOGLE_KEY:
         try:
@@ -190,7 +238,7 @@ async def geocode(req: SearchRequest):
                 if data.get("status") == "OK" and data.get("results"):
                     loc = data["results"][0]["geometry"]["location"]
                     result = (loc["lat"], loc["lng"], data["results"][0]["formatted_address"])
-                    cache_put(_geocode_cache, key, result)
+                    await geocode_cache.put(key, list(result))
                     return result
         except Exception as e:
             logger.warning(f"Geocode failed: {e}")
@@ -229,7 +277,7 @@ def _is_excluded(p):
     types = set(p.get("types", []))
     if types & EXCLUDED_TYPES or p.get("primaryType") in EXCLUDED_TYPES | EXCLUDED_PRIMARY_TYPES:
         return True
-    if p.get("id") in EXCLUDED_PLACE_IDS:
+    if p.get("id") in EXCLUDED_PLACE_IDS or p.get("id") in HIDDEN_IDS:
         return True
     text = f"{p.get('displayName', {}).get('text', '')} {p.get('formattedAddress', '')}".lower()
     return any(w in text for w in EXCLUDED_NAME_WORDS)
@@ -270,7 +318,7 @@ async def google_places(hc, mode, value, fallback_cat, lat, lng, radius_m, photo
             "locationBias": {"circle": {"center": {"latitude": lat, "longitude": lng}, "radius": radius_m}},
         }
     cache_key = (url, str(value), round(lat, 2), round(lng, 2), radius_m, PLACES_FIELD_MASK)
-    data = cache_get(_places_cache, cache_key, CACHE_TTL_S)
+    data = await places_cache.get(cache_key)
     if data is None:
         try:
             r = await hc.post(url, headers=headers, json=body)
@@ -285,7 +333,7 @@ async def google_places(hc, mode, value, fallback_cat, lat, lng, radius_m, photo
                 status = ""
             raise RuntimeError(f"{r.status_code} {status}".strip())
         data = r.json()
-        cache_put(_places_cache, cache_key, data)
+        await places_cache.put(cache_key, data)
 
     out = []
     for p in data.get("places", []):
@@ -344,7 +392,7 @@ async def health():
 async def place_photo(name: str):
     if not GOOGLE_KEY or not PHOTO_NAME_RE.match(name):
         raise HTTPException(status_code=404, detail="Photo not found")
-    uri = cache_get(_photo_cache, name, PHOTO_CACHE_TTL_S)
+    uri = await photo_cache.get(name)
     if uri is None:
         async with httpx.AsyncClient(timeout=10) as hc:
             r = await hc.get(
@@ -355,7 +403,7 @@ async def place_photo(name: str):
         if not uri:
             logger.warning(f"Google photo error {r.status_code}: {r.text[:200]}")
             raise HTTPException(status_code=404, detail="Photo not found")
-        cache_put(_photo_cache, name, uri, max_items=5000)
+        await photo_cache.put(name, uri)
     return RedirectResponse(uri, status_code=302, headers={"Cache-Control": "public, max-age=86400"})
 
 
@@ -392,6 +440,8 @@ async def search_places(req: SearchRequest, request: Request):
 
     # Always include curated Israeli activities (rich fallback + local knowledge)
     for a in ACTIVITIES:
+        if a["id"] in HIDDEN_IDS:
+            continue
         item = dict(a)
         item["source"] = "curated"
         results.append(item)
@@ -477,6 +527,8 @@ def get_events(  # sync: FastAPI runs it in a threadpool so blocking scrapes don
                 item["distance_km"] = round(d, 1)
             if family_only and not item.get("family"):
                 continue
+            if item["id"] in HIDDEN_IDS:
+                continue
             dedupe = (item["name"].strip(), item["date"])
             if dedupe in seen:
                 continue
@@ -497,7 +549,99 @@ def get_sources(refresh: bool = False):
     return sources_status(refresh=refresh)
 
 
+# ---------- Reports ("this place/event is wrong") ----------
+
+REPORT_HIDE_THRESHOLD = 3          # distinct reporters before an item is hidden
+ADMIN_KEY = os.environ.get("ADMIN_KEY", "").strip()
+HIDDEN_IDS = set()                 # loaded from Mongo; applied to places and events
+_reports_mem = []                  # fallback when no database is configured
+
+
+class ReportRequest(BaseModel):
+    item_id: str = Field(min_length=1, max_length=200)
+    kind: str = Field(default="place", pattern="^(place|event)$")
+    name: str = Field(default="", max_length=200)
+    reason: str = Field(default="other", max_length=40)
+    comment: str = Field(default="", max_length=500)
+
+
+def _reporter_hash(request: Request):
+    ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "")
+    return hashlib.sha256(f"{ip.split(',')[0].strip()}|{ADMIN_KEY}".encode()).hexdigest()[:16]
+
+
+async def load_hidden_ids():
+    if db is None:
+        return
+    try:
+        ids = [d["_id"] async for d in db.hidden.find({}, {"_id": 1})]
+        HIDDEN_IDS.update(ids)
+    except Exception as e:
+        logger.warning(f"Loading hidden ids failed: {e}")
+
+
+@api_router.post("/report")
+async def report_item(rep: ReportRequest, request: Request):
+    doc = {**rep.model_dump(), "reporter": _reporter_hash(request), "at": datetime.now(timezone.utc).isoformat()}
+    if db is None:
+        _reports_mem.append(doc)
+        del _reports_mem[:-500]
+        return {"ok": True, "stored": "memory"}
+    try:
+        await db.reports.update_one(
+            {"item_id": rep.item_id, "reporter": doc["reporter"]}, {"$set": doc}, upsert=True)
+        distinct = len(await db.reports.distinct("reporter", {"item_id": rep.item_id}))
+        if distinct >= REPORT_HIDE_THRESHOLD:
+            await db.hidden.update_one({"_id": rep.item_id},
+                                       {"$set": {"name": rep.name, "kind": rep.kind, "auto": True}}, upsert=True)
+            HIDDEN_IDS.add(rep.item_id)
+    except Exception as e:
+        logger.warning(f"Saving report failed: {e}")
+        return {"ok": False}
+    return {"ok": True, "stored": "db"}
+
+
+@api_router.get("/reports")
+async def list_reports(key: str = ""):
+    """Admin view: /api/reports?key=ADMIN_KEY"""
+    if not ADMIN_KEY or key != ADMIN_KEY:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    if db is None:
+        return {"reports": _reports_mem[-200:], "hidden": sorted(HIDDEN_IDS)}
+    reports = [{k: v for k, v in d.items() if k != "_id"}
+               async for d in db.reports.find().sort("at", -1).limit(300)]
+    return {"reports": reports, "hidden": sorted(HIDDEN_IDS)}
+
+
+@api_router.post("/hide")
+async def hide_item(item_id: str, key: str = "", unhide: bool = False):
+    """Admin: hide/unhide an item right away. /api/hide?item_id=...&key=ADMIN_KEY"""
+    if not ADMIN_KEY or key != ADMIN_KEY:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    if unhide:
+        HIDDEN_IDS.discard(item_id)
+        if db is not None:
+            await db.hidden.delete_one({"_id": item_id})
+    else:
+        HIDDEN_IDS.add(item_id)
+        if db is not None:
+            await db.hidden.update_one({"_id": item_id}, {"$set": {"auto": False}}, upsert=True)
+    return {"ok": True, "hidden": not unhide}
+
+
 app.include_router(api_router)
+
+
+@app.on_event("startup")
+async def startup():
+    if db is None:
+        return
+    try:
+        await db.cache.create_index("expires", expireAfterSeconds=0)
+        await db.reports.create_index([("item_id", 1), ("reporter", 1)], unique=True)
+    except Exception as e:
+        logger.warning(f"Mongo index setup failed: {e}")
+    await load_hidden_ids()
 
 app.add_middleware(
     CORSMiddleware,

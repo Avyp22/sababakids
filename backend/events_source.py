@@ -204,6 +204,7 @@ def _base_event(**kw):
         "lat": None, "lng": None, "image": None, "time": "", "date": None, "end_date": None,
         "price": None, "price_text": None, "ages": [], "family": False, "description": "",
         "ticket_url": None, "ics_url": None, "source": "", "rtl": True,
+        "approx": False,  # True when lat/lng is the city centre, not the venue
     }
     ev.update(kw)
     return ev
@@ -291,7 +292,8 @@ def _parse_modiin(html):
         ages = _map_ages(full_text)
         events.append(_base_event(
             id=f"modiin-{eid or len(events)}", name=name, category=_detect_category(full_text),
-            venue=venue, city="מודיעין", address=venue, lat=lat, lng=lng, image=image,
+            venue=venue, city="מודיעין", address=venue, lat=lat or EVENT_SOURCES[0]["center"][0],
+            lng=lng or EVENT_SOURCES[0]["center"][1], approx=lat is None, image=image,
             time=tm.group(1) if tm else "", date=ev_date.isoformat(),
             price=_detect_price(full_text), ages=ages, family=is_family(full_text, ages, name=name),
             description=description[:400], ticket_url=ticket_url or MODIIN_URL, ics_url=ics_url,
@@ -373,7 +375,7 @@ def _parse_holon(html):
         ages = _map_ages(blob)
         events.append(_base_event(
             id=f"holon-{eid}", name=name, category=_detect_category(f"{name} {category_he}"),
-            venue=venue, city="חולון", address=venue, lat=center[0], lng=center[1], image=image,
+            venue=venue, city="חולון", address=venue, lat=center[0], lng=center[1], approx=True, image=image,
             time=tm.group(0) if tm else "", date=span[0].isoformat(),
             end_date=span[1].isoformat() if span[1] != span[0] else None,
             price=_detect_price(blob), ages=ages, family=is_family(blob, ages, audience=audience, name=name),
@@ -469,7 +471,7 @@ def _haifa_sub_events(item, today):
         events.append(_base_event(
             id=f"haifa-{item['eid']}-{d.isoformat()}-{m.group(4)}-{i}", name=name,
             category=_detect_category(blob), venue=venue or item["venue"], city="חיפה",
-            address=item["venue"], lat=center[0], lng=center[1], image=item["image"],
+            address=item["venue"], lat=center[0], lng=center[1], approx=True, image=item["image"],
             time=m.group(4), date=d.isoformat(), price=price,
             price_text=price_raw if "₪" in price_raw else None, ages=ages,
             family=is_family(blob, ages, name=name), description=description[:400],
@@ -509,7 +511,7 @@ def fetch_haifa():
         events.append(_base_event(
             id=f"haifa-{it['eid']}-{span[0].isoformat()}-{it['time']}", name=it["name"],
             category=_detect_category(it["name"]), venue=it["venue"], city="חיפה", address=it["venue"],
-            lat=center[0], lng=center[1], image=it["image"], time=it["time"],
+            lat=center[0], lng=center[1], approx=True, image=it["image"], time=it["time"],
             date=span[0].isoformat(), end_date=span[1].isoformat() if span[1] != span[0] else None,
             price="free" if it["free"] else None, ages=ages, family=fam,
             description=it["venue"], ticket_url=it["url"], source="Haifa Municipality",
@@ -588,7 +590,7 @@ def fetch_leaan():
             id=f"leaan-{eid}", name=name, category=_leaan_category(name, cat_name),
             venue=loc.get("name", ""), city=city,
             address=", ".join([p for p in [loc.get("name"), loc.get("street"), city] if p]),
-            lat=coords[0] if coords else None, lng=coords[1] if coords else None,
+            lat=coords[0] if coords else None, lng=coords[1] if coords else None, approx=True,
             image=image, time=dt.strftime("%H:%M"), date=dt.date().isoformat(),
             price="paid" if price_val and price_val > 0 else "free",
             price_text=f"₪{price_val}+" if price_val else None,
@@ -630,6 +632,44 @@ def fetch_snapshot(key):
     return events
 
 
+# ---------- Venue geocoding ----------
+# snapshot_events.py --geocode builds geocache.json (OpenStreetMap Nominatim, free)
+# on the event-data branch: {"<city>|<venue>": {"lat":..,"lng":..} | {"miss": ts}}.
+# Applying it turns city-centre coordinates into the venue's real position.
+_GEO = {"ts": 0.0, "data": {}}
+GEOCACHE_TTL = 6 * 3600
+
+
+def geo_key(city, venue):
+    return f"{(city or '').strip()}|{(venue or '').strip()}"
+
+
+def load_geocache():
+    if time.time() - _GEO["ts"] < GEOCACHE_TTL:
+        return _GEO["data"]
+    _GEO["ts"] = time.time()
+    try:
+        r = httpx.get(f"{SNAPSHOT_BASE}/geocache.json", timeout=15, headers=UA)
+        r.raise_for_status()
+        _GEO["data"] = r.json()
+    except Exception as e:
+        logger.warning(f"geocache unavailable: {e}")
+    return _GEO["data"]
+
+
+def apply_geocache(events):
+    data = load_geocache()
+    if not data:
+        return events
+    out = []
+    for ev in events:
+        hit = data.get(geo_key(ev.get("city"), ev.get("venue"))) if ev.get("approx") else None
+        if hit and "lat" in hit:
+            ev = {**ev, "lat": hit["lat"], "lng": hit["lng"], "approx": False}
+        out.append(ev)
+    return out
+
+
 def fetch_source(key):
     cached = _CACHE.get(key)
     if cached and (time.time() - cached[0]) < _CACHE_TTL:
@@ -637,6 +677,7 @@ def fetch_source(key):
     try:
         use_snapshot = USE_SNAPSHOTS and key in GEO_BLOCKED
         events = fetch_snapshot(key) if use_snapshot else FETCHERS[key]()
+        events = apply_geocache(events)
         _CACHE[key] = (time.time(), events)
         _STATUS[key] = {"ok": True, "count": len(events), "at": datetime.now(TZ).isoformat(),
                         "via": "snapshot" if use_snapshot else "direct"}

@@ -22,6 +22,8 @@ services:
         sync: false   # optional, set in the dashboard (MongoDB Atlas free M0)
       - key: GOOGLE_MAPS_API_KEY
         sync: false   # set in the dashboard, never commit it
+      - key: ADMIN_KEY
+        generateValue: true   # protects /api/reports and /api/hide (see Render > Environment)
 
   - type: web
     name: sababakids
@@ -42,3 +44,5 @@ services:
         value: "false"
       - key: REACT_APP_BACKEND_URL
         value: https://sababakids-api.onrender.com
+      - key: REACT_APP_GOATCOUNTER
+        sync: false   # optional: GoatCounter site code (e.g. "sababakids") for usage stats

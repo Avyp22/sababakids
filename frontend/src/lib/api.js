@@ -12,3 +12,9 @@ export async function getEvents(params = {}) {
   const { data } = await axios.get(`${API}/events`, { params });
   return data;
 }
+
+// "This place/event is wrong": {item_id, kind: "place"|"event", name, reason, comment}
+export async function reportItem(payload) {
+  const { data } = await axios.post(`${API}/report`, payload);
+  return data;
+}

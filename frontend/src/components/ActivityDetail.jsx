@@ -8,6 +8,7 @@ import {
 import { CATEGORY_MAP, catLabel } from "@/lib/categories";
 import { SettingBadge, PriceBadge, OpenNowBadge, SourceTag } from "@/components/ActivityCard";
 import { useI18n, FEATURE_LABELS } from "@/lib/i18n";
+import { ReportButton } from "@/components/ReportButton";
 import { cn } from "@/lib/utils";
 
 export function ActivityDetail({ activity, open, onClose, isFavorite, onToggleFavorite }) {
@@ -137,7 +138,8 @@ export function ActivityDetail({ activity, open, onClose, isFavorite, onToggleFa
             </Button>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-between items-start gap-3 flex-wrap">
+            <ReportButton itemId={activity.id} kind="place" name={activity.name} />
             <SourceTag source={activity.source} />
           </div>
         </div>

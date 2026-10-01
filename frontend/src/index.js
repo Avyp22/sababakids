@@ -3,6 +3,9 @@ import ReactDOM from "react-dom/client";
 import "@/index.css";
 import App from "@/App";
 import { I18nProvider } from "@/lib/i18n";
+import { initAnalytics } from "@/lib/analytics";
+
+initAnalytics();
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

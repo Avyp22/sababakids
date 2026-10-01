@@ -122,3 +122,20 @@ def test_events_no_coords(client):
     assert r.status_code == 200
     data = r.json()
     assert data["count"] > 0
+
+
+# --- Reports ---
+def test_report_accepted():
+    r = requests.post(f"{BASE_URL}/api/report",
+                      json={"item_id": "test-item", "kind": "place", "name": "Test", "reason": "other"})
+    assert r.status_code == 200
+    assert r.json()["ok"] is True
+
+
+def test_report_rejects_bad_kind():
+    r = requests.post(f"{BASE_URL}/api/report", json={"item_id": "x", "kind": "hack"})
+    assert r.status_code == 422
+
+
+def test_reports_admin_requires_key():
+    assert requests.get(f"{BASE_URL}/api/reports").status_code == 403

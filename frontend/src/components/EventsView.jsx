@@ -3,6 +3,7 @@ import { EVENT_ICONS } from "@/lib/categories";
 import { PriceBadge } from "@/components/ActivityCard";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
+import { ReportButton } from "@/components/ReportButton";
 
 // Google Calendar "add event" link, used when the source has no .ics file.
 function googleCalendarUrl(ev) {
@@ -100,8 +101,12 @@ export function EventsView({ events, loading, familyOnly }) {
                   <span key={a} dir="ltr" className="px-1.5 py-0.5 rounded-md bg-muted text-[10px] font-semibold text-muted-foreground">{a}</span>
                 ))}
                 {typeof ev.distance_km === "number" && (
-                  <span className="flex items-center gap-0.5 text-[10px] font-semibold text-muted-foreground ms-auto" dir="ltr">
-                    <Navigation className="w-3 h-3" /> {ev.distance_km} km
+                  <span
+                    className="flex items-center gap-0.5 text-[10px] font-semibold text-muted-foreground ms-auto"
+                    dir="ltr"
+                    title={ev.approx ? t("approx") : undefined}
+                  >
+                    <Navigation className="w-3 h-3" /> {ev.approx ? "≈ " : ""}{ev.distance_km} km
                   </span>
                 )}
               </div>
@@ -121,9 +126,10 @@ export function EventsView({ events, loading, familyOnly }) {
                 </Button>
               </div>
 
-              <div className="flex items-center gap-1.5 mt-3 pt-2 border-t border-border/60 text-[10px] text-muted-foreground">
+              <div className="flex items-center gap-1.5 mt-3 pt-2 border-t border-border/60 text-[10px] text-muted-foreground flex-wrap">
                 <Radio className="w-3 h-3 text-emerald-500" />
                 <span>{t("live")} · {ev.source}</span>
+                <ReportButton itemId={ev.id} kind="event" name={ev.name} className="ms-auto" />
               </div>
             </div>
           </div>

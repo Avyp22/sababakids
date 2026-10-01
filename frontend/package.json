@@ -63,7 +63,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "craco build",
+    "build": "craco build && node scripts/prerender-cities.js",
     "test": "craco test"
   },
   "browserslist": {

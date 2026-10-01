@@ -46,9 +46,10 @@ jobs:
             git -C data rm -rfq .
           fi
 
-      - name: Fetch snapshots
+      # Also geocodes venues (OpenStreetMap, 1 req/s): the first run takes a few minutes.
+      - name: Fetch snapshots + geocode venues
         working-directory: backend
-        run: python snapshot_events.py --out ../data haifa holon || echo "some sources failed"
+        run: python snapshot_events.py --out ../data --geocode --also-geocode leaan modiin haifa holon || echo "some sources failed"
 
       - name: Publish
         working-directory: data

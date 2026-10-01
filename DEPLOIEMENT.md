@@ -73,3 +73,26 @@ cd frontend && yarn install && yarn start   # frontend/.env : REACT_APP_BACKEND_
 - Non connectables aujourd'hui : Jérusalem (403), Kfar Saba, Herzliya, Bat Yam, Givatayim, Hod Hasharon (anti-bot), Netanya (Cloudflare), Tel Aviv (chargement JavaScript).
 - Ajouter une ville : écrire un `fetch_<ville>()` dans `backend/events_source.py`, l'ajouter à `EVENT_SOURCES` et `FETCHERS`.
 - Santé des sources : `GET /api/sources?refresh=true`. Le workflow `check-event-sources` l'appelle chaque matin et échoue (→ e-mail GitHub) si une source ne renvoie plus rien.
+
+## Fonctions à activer (comptes gratuits à créer par toi)
+
+### Statistiques de visite — GoatCounter (sans cookies, sans bannière)
+1. <https://www.goatcounter.com/signup> → code du site : par ex. `sababakids`.
+2. Render → service **sababakids** (static) → Environment → `REACT_APP_GOATCOUNTER` = `sababakids` → redéployer.
+3. Tableau de bord : `https://sababakids.goatcounter.com` (pages vues, villes ouvertes via /haifa…, événements « search/park », « tab/events », « events-date/weekend », « weather/rain-indoor », « report/... »).
+
+### Base de données — MongoDB Atlas M0 (cache Google persistant + signalements)
+1. <https://www.mongodb.com/cloud/atlas/register> → cluster **M0 Free** (région Francfort).
+2. Database Access → un utilisateur ; Network Access → `0.0.0.0/0`.
+3. Connect → Drivers → copier `mongodb+srv://...` → Render → **sababakids-api** → `MONGO_URL`.
+Sans MongoDB tout marche, mais le cache Google repart de zéro à chaque redémarrage et les signalements ne sont gardés qu'en mémoire.
+
+### Signalements
+- Bouton « Signaler un problème » sur chaque lieu et événement.
+- 3 signalements de personnes différentes → l'élément est masqué automatiquement (nécessite MongoDB).
+- Consulter : `https://sababakids-api.onrender.com/api/reports?key=<ADMIN_KEY>` (ADMIN_KEY générée par Render → sababakids-api → Environment).
+- Masquer / réafficher tout de suite : `POST /api/hide?item_id=<id>&key=<ADMIN_KEY>` (ajouter `&unhide=true` pour réafficher).
+
+### Référencement
+- Pages par ville : `/tel-aviv`, `/haifa`, `/holon`, `/jerusalem`… (liste : `frontend/src/lib/cities.json`), générées au build.
+- Google Search Console : <https://search.google.com/search-console> → ajouter le site → soumettre `https://sababakids.onrender.com/sitemap.xml`.

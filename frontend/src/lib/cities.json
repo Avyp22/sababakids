@@ -1,0 +1,18 @@
+[
+  { "slug": "tel-aviv", "query": "Tel Aviv", "he": "תל אביב", "en": "Tel Aviv", "fr": "Tel Aviv" },
+  { "slug": "jerusalem", "query": "Jerusalem", "he": "ירושלים", "en": "Jerusalem", "fr": "Jérusalem" },
+  { "slug": "haifa", "query": "Haifa", "he": "חיפה", "en": "Haifa", "fr": "Haïfa" },
+  { "slug": "holon", "query": "Holon", "he": "חולון", "en": "Holon", "fr": "Holon" },
+  { "slug": "modiin", "query": "Modiin", "he": "מודיעין", "en": "Modi'in", "fr": "Modiin" },
+  { "slug": "rishon-lezion", "query": "Rishon LeZion", "he": "ראשון לציון", "en": "Rishon LeZion", "fr": "Rishon LeZion" },
+  { "slug": "petah-tikva", "query": "Petah Tikva", "he": "פתח תקווה", "en": "Petah Tikva", "fr": "Petah Tikva" },
+  { "slug": "netanya", "query": "Netanya", "he": "נתניה", "en": "Netanya", "fr": "Netanya" },
+  { "slug": "ashdod", "query": "Ashdod", "he": "אשדוד", "en": "Ashdod", "fr": "Ashdod" },
+  { "slug": "beer-sheva", "query": "Beer Sheva", "he": "באר שבע", "en": "Beersheba", "fr": "Beer-Sheva" },
+  { "slug": "herzliya", "query": "Herzliya", "he": "הרצליה", "en": "Herzliya", "fr": "Herzliya" },
+  { "slug": "raanana", "query": "Raanana", "he": "רעננה", "en": "Ra'anana", "fr": "Raanana" },
+  { "slug": "ramat-gan", "query": "Ramat Gan", "he": "רמת גן", "en": "Ramat Gan", "fr": "Ramat Gan" },
+  { "slug": "rehovot", "query": "Rehovot", "he": "רחובות", "en": "Rehovot", "fr": "Rehovot" },
+  { "slug": "kfar-saba", "query": "Kfar Saba", "he": "כפר סבא", "en": "Kfar Saba", "fr": "Kfar Saba" },
+  { "slug": "eilat", "query": "Eilat", "he": "אילת", "en": "Eilat", "fr": "Eilat" }
+]

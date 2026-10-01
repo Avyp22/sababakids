@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { toast } from "sonner";
 import { LayoutGrid, Map as MapIcon, Calendar, Heart, SearchX, Loader2, Share2, LocateFixed, X } from "lucide-react";
 import { Header } from "@/components/Header";
@@ -11,6 +11,9 @@ import { useFavorites, useTheme, loadPrefs, savePrefs } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { track } from "@/lib/analytics";
+import { getWeather, weatherAdvice, weatherEmoji } from "@/lib/weather";
+import CITIES from "@/lib/cities.json";
 
 // Leaflet is only downloaded when the Map tab is opened.
 const MapView = lazy(() => import("@/components/MapView"));
@@ -24,6 +27,36 @@ const TABS = [
 
 const DEFAULT_CENTER = { lat: 32.0853, lng: 34.7818, label: "Tel Aviv" };
 
+// SEO city pages (/haifa, /holon...) open the app on that city.
+const URL_CITY = CITIES.find((c) => window.location.pathname.replace(/\/+$/, "") === `/${c.slug}`);
+
+const DATE_RANGES = ["all", "today", "tomorrow", "weekend", "week"];
+
+function isoToday() {
+  return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jerusalem" });
+}
+
+function addDays(iso, n) {
+  const d = new Date(`${iso}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+// [from, to] (inclusive ISO dates) for a date filter; the Israeli weekend is Friday-Saturday.
+function dateWindow(range) {
+  const today = isoToday();
+  if (range === "today") return [today, today];
+  if (range === "tomorrow") return [addDays(today, 1), addDays(today, 1)];
+  if (range === "week") return [today, addDays(today, 6)];
+  if (range === "weekend") {
+    const dow = new Date(`${today}T12:00:00Z`).getUTCDay(); // 0 = Sunday ... 5 = Friday, 6 = Saturday
+    if (dow === 6) return [today, today];
+    const toFriday = (5 - dow + 7) % 7;
+    return [addDays(today, toFriday), addDays(today, toFriday + 1)];
+  }
+  return null;
+}
+
 export default function Explore() {
   const { t } = useI18n();
   const { dark, setDark } = useTheme();
@@ -31,7 +64,7 @@ export default function Explore() {
   const [prefs] = useState(loadPrefs);
 
   const [tab, setTab] = useState("list");
-  const [locationInput, setLocationInput] = useState(prefs.location || "Tel Aviv");
+  const [locationInput, setLocationInput] = useState(URL_CITY?.query || prefs.location || "Tel Aviv");
   const [radius, setRadius] = useState(prefs.radius || 10);
   const [category, setCategory] = useState(prefs.category || "all");
   const [ages, setAges] = useState(prefs.ages || []);
@@ -39,7 +72,9 @@ export default function Explore() {
   const [price, setPrice] = useState("all");
   const [gpsCoords, setGpsCoords] = useState(null);
   const [gpsLoading, setGpsLoading] = useState(false);
-  const [showGpsPrompt, setShowGpsPrompt] = useState(!prefs.location);
+  const [showGpsPrompt, setShowGpsPrompt] = useState(!prefs.location && !URL_CITY);
+  const [dateRange, setDateRange] = useState("all");
+  const [weather, setWeather] = useState(null);
 
   const [center, setCenter] = useState(DEFAULT_CENTER);
   const [activities, setActivities] = useState([]);
@@ -67,6 +102,7 @@ export default function Explore() {
       setCenter(data.center);
       setGoogleDown(!data.google_enabled || (data.google_errors || []).length > 0);
       if (!gpsCoords) savePrefs({ location: locationInput });
+      track("search", `${category}${gpsCoords ? "-gps" : ""}`);
     } catch (e) {
       toast.error(t("loadError"));
     } finally {
@@ -115,7 +151,7 @@ export default function Explore() {
 
   // If the user already allowed location access, use it straight away.
   useEffect(() => {
-    if (prefs.location || !navigator.permissions?.query) return;
+    if (prefs.location || URL_CITY || !navigator.permissions?.query) return;
     navigator.permissions.query({ name: "geolocation" })
       .then((st) => { if (st.state === "granted") handleUseGps(true); })
       .catch(() => {});
@@ -142,6 +178,26 @@ export default function Explore() {
   };
 
   const centerLabel = center.label === "Your location" ? t("yourLocation") : center.label;
+
+  // Weather for the searched area (Open-Meteo, free).
+  useEffect(() => {
+    let active = true;
+    getWeather(center.lat, center.lng).then((w) => active && setWeather(w)).catch(() => {});
+    return () => { active = false; };
+  }, [center.lat, center.lng]);
+  const advice = weatherAdvice(weather);
+
+  const shownEvents = useMemo(() => {
+    const win = dateWindow(dateRange);
+    if (!win) return events;
+    const [from, to] = win;
+    return events.filter((e) => e.date <= to && (e.end_date || e.date) >= from);
+  }, [events, dateRange]);
+
+  // City pages: localized title for search engines and shared links.
+  useEffect(() => {
+    if (URL_CITY) document.title = `${t("cityTitle", { city: URL_CITY[document.documentElement.lang] || URL_CITY.en })} | SababaKids`;
+  }, [t]);
   const gridData = tab === "saved" ? favorites : activities;
 
   return (
@@ -189,7 +245,7 @@ export default function Explore() {
               return (
                 <button
                   key={tb.id}
-                  onClick={() => setTab(tb.id)}
+                  onClick={() => { setTab(tb.id); track("tab", tb.id); }}
                   data-testid={`tab-${tb.id}`}
                   className={cn(
                     "flex items-center gap-2 px-4 h-10 rounded-xl text-sm font-semibold transition-colors",
@@ -208,7 +264,7 @@ export default function Explore() {
 
           <div className="text-sm text-muted-foreground" data-testid="result-summary">
             {tab === "events" ? (
-              <span>{t("upcomingEvents", { n: events.length })}</span>
+              <span>{t("upcomingEvents", { n: shownEvents.length })}</span>
             ) : tab === "saved" ? (
               <span>{t("savedCount", { n: favorites.length })}</span>
             ) : loading ? (
@@ -218,6 +274,35 @@ export default function Explore() {
             )}
           </div>
         </div>
+
+        {weather && tab === "list" && (
+          <div
+            className={cn(
+              "mb-4 flex items-center gap-3 rounded-2xl px-4 py-2.5 border flex-wrap",
+              advice === "nice" ? "bg-emerald-500/10 border-emerald-500/20" : "bg-sky-500/10 border-sky-500/20"
+            )}
+            data-testid="weather-banner"
+          >
+            <span className="text-xl" aria-hidden>{weatherEmoji(weather)}</span>
+            <p className="text-sm font-medium flex-1 min-w-[180px]">
+              {advice === "rain" ? t("weatherRain", { p: weather.rainChance })
+                : advice === "hot" ? t("weatherHot", { t: weather.max })
+                : t("weatherNice", { t: weather.now })}
+            </p>
+            {advice !== "nice" && setting !== "indoor" && (
+              <Button size="sm" variant="outline" className="rounded-xl h-8"
+                onClick={() => { setSetting("indoor"); track("weather", `${advice}-indoor`); }}>
+                {t("seeIndoor")}
+              </Button>
+            )}
+            {advice === "hot" && category !== "water_park" && (
+              <Button size="sm" variant="outline" className="rounded-xl h-8"
+                onClick={() => { setSetting("all"); setCategory("water_park"); track("weather", "hot-water"); }}>
+                {t("seeWater")}
+              </Button>
+            )}
+          </div>
+        )}
 
         {googleDown && !loading && (tab === "list" || tab === "map") && (
           <div className="mb-4 text-xs text-muted-foreground bg-accent/10 border border-accent/20 rounded-xl px-3 py-2" data-testid="google-notice">
@@ -231,6 +316,25 @@ export default function Explore() {
             <Button onClick={shareFavorites} className="rounded-xl gap-2 bg-[#25D366] hover:bg-[#1ebe5b] text-white" data-testid="btn-share-whatsapp">
               <Share2 className="w-4 h-4" /> {t("shareWhatsapp")}
             </Button>
+          </div>
+        )}
+
+        {tab === "events" && (
+          <div className="mb-3 flex gap-1.5 overflow-x-auto no-scrollbar -mx-1 px-1" role="group" data-testid="date-filter">
+            {DATE_RANGES.map((r) => (
+              <button
+                key={r}
+                onClick={() => { setDateRange(r); track("events-date", r); }}
+                aria-pressed={dateRange === r}
+                data-testid={`date-${r}`}
+                className={cn(
+                  "px-3 h-8 rounded-full text-xs font-semibold border whitespace-nowrap transition-colors",
+                  dateRange === r ? "bg-primary text-primary-foreground border-primary" : "bg-background border-border text-foreground/80"
+                )}
+              >
+                {t(`date${r[0].toUpperCase()}${r.slice(1)}`)}
+              </button>
+            ))}
           </div>
         )}
 
@@ -266,7 +370,7 @@ export default function Explore() {
             <MapView center={center} activities={activities} onOpen={openDetail} />
           </Suspense>
         ) : tab === "events" ? (
-          <EventsView events={events} loading={eventsLoading} familyOnly={familyOnly} />
+          <EventsView events={shownEvents} loading={eventsLoading} familyOnly={familyOnly} />
         ) : loading && tab === "list" ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -306,7 +410,7 @@ export default function Explore() {
           return (
             <button
               key={tb.id}
-              onClick={() => setTab(tb.id)}
+              onClick={() => { setTab(tb.id); track("tab", tb.id); }}
               data-testid={`nav-${tb.id}`}
               aria-current={tab === tb.id ? "page" : undefined}
               className={cn(
