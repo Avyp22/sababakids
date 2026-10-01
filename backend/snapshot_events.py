@@ -7,7 +7,9 @@ runs this script and publishes the JSON on the `event-data` branch, which the
 backend reads instead of calling those sites.
 
     python snapshot_events.py --out <dir> haifa holon
-    python snapshot_events.py --out <dir> --geocode --also-geocode leaan modiin haifa holon
+    python snapshot_events.py --out <dir> haifa holon --geocode --also-geocode leaan modiin
+
+(source names must come before --also-geocode, which takes the rest of the line)
 
 A source that fails keeps its previous snapshot file untouched.
 

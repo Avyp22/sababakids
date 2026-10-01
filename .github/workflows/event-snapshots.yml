@@ -51,7 +51,7 @@ jobs:
         working-directory: backend
         env:
           SNAPSHOT_RUNNER: github
-        run: python snapshot_events.py --out ../data --geocode --also-geocode leaan modiin haifa holon || echo "some sources failed"
+        run: python snapshot_events.py --out ../data haifa holon --geocode --also-geocode leaan modiin || echo "some sources failed"
 
       - name: Publish
         working-directory: data
