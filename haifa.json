@@ -1,6 +1,6 @@
 {
  "source": "haifa",
- "generated_at": "2026-10-02T20:53:31.329340+03:00",
+ "generated_at": "2026-10-03T01:15:43.961418+03:00",
  "events": [
   {
    "id": "haifa-687602-2026-10-08-21:00",
@@ -579,7 +579,7 @@
    "approx": true
   },
   {
-   "id": "haifa-1032826-2026-10-02-",
+   "id": "haifa-1032826-2026-10-03-",
    "name": "פסטיבל הסרטים הבינלאומי חיפה ה-42",
    "category": "festival",
    "venue": "אודיטוריום חיפה",
@@ -589,8 +589,8 @@
    "lng": 34.9896,
    "image": "https://www.haifa.muni.il/wp-content/uploads/2025/09/פסטיבל-הסרטים-הבינלאומי-ה-42-חיפה-361x227.jpg",
    "time": "",
-   "date": "2026-10-02",
-   "end_date": "2026-10-03",
+   "date": "2026-10-03",
+   "end_date": null,
    "price": null,
    "price_text": null,
    "ages": [],
@@ -1035,7 +1035,7 @@
    "approx": true
   },
   {
-   "id": "haifa-1431777-2026-10-02-",
+   "id": "haifa-1431777-2026-10-03-",
    "name": "מצפה כוכבים בלייב ובאור יום",
    "category": "activity",
    "venue": "מדעטק חיפה",
@@ -1045,7 +1045,7 @@
    "lng": 34.9896,
    "image": "https://www.haifa.muni.il/wp-content/uploads/2026/09/WhatsApp-Image-2026-09-23-at-12.55.34-361x227.jpeg",
    "time": "",
-   "date": "2026-10-02",
+   "date": "2026-10-03",
    "end_date": "2026-10-31",
    "price": null,
    "price_text": null,
@@ -3531,30 +3531,6 @@
    "family": false,
    "description": "",
    "ticket_url": "https://www.haifa.muni.il/event/%d7%90%d7%99%d7%a8%d7%95%d7%a2%d7%99-%d7%9e%d7%a8%d7%9b%d7%96-%d7%a7%d7%94%d7%99%d7%9c%d7%aa%d7%99-%d7%9b%d7%91%d7%90%d7%91%d7%99%d7%a8/",
-   "ics_url": null,
-   "source": "Haifa Municipality",
-   "rtl": true,
-   "approx": true
-  },
-  {
-   "id": "haifa-1415739-2026-10-02-07:30-7",
-   "name": "טיול לנשים לחמאם תורכי",
-   "category": "activity",
-   "venue": "באקה אלג'רביה",
-   "city": "חיפה",
-   "address": "מרכז קהילתי חליסה",
-   "lat": 32.794,
-   "lng": 34.9896,
-   "image": "https://www.haifa.muni.il/wp-content/uploads/2026/07/מתנס-נווה-יוסף-e1788432578761-361x227.jpg",
-   "time": "07:30",
-   "date": "2026-10-02",
-   "end_date": null,
-   "price": "paid",
-   "price_text": "200 ₪",
-   "ages": [],
-   "family": false,
-   "description": "טיול הכולל ארוחת צהרים עשירה במטרה לשימור מתנדבות.",
-   "ticket_url": "https://www.haifa.muni.il/event/%d7%90%d7%99%d7%a8%d7%95%d7%a2%d7%99-%d7%9e%d7%a8%d7%9b%d7%96-%d7%a7%d7%94%d7%99%d7%9c%d7%aa%d7%99-%d7%97%d7%9c%d7%99%d7%a1%d7%94/",
    "ics_url": null,
    "source": "Haifa Municipality",
    "rtl": true,
