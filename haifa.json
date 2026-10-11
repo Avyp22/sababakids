@@ -1,6 +1,6 @@
 {
  "source": "haifa",
- "generated_at": "2026-10-11T15:51:56.813037+03:00",
+ "generated_at": "2026-10-11T22:34:37.778565+03:00",
  "events": [
   {
    "id": "haifa-1435966-2026-10-15-21:00",
@@ -621,6 +621,30 @@
    "family": true,
    "description": "אמפי ואדי סאליב",
    "ticket_url": "https://www.haifa.muni.il/event/pishpishim-kids/",
+   "ics_url": null,
+   "source": "Haifa Municipality",
+   "rtl": true,
+   "approx": true
+  },
+  {
+   "id": "haifa-1441531-2026-11-23-08:30",
+   "name": "ועידת רוטרי חיפה לעסקים",
+   "category": "activity",
+   "venue": "מלון גארדן",
+   "city": "חיפה",
+   "address": "מלון גארדן",
+   "lat": 32.794,
+   "lng": 34.9896,
+   "image": "https://www.haifa.muni.il/wp-content/uploads/2026/10/ועידת-רוטרי-לעסקים-361x227.jpg",
+   "time": "08:30",
+   "date": "2026-11-23",
+   "end_date": null,
+   "price": null,
+   "price_text": null,
+   "ages": [],
+   "family": false,
+   "description": "מלון גארדן",
+   "ticket_url": "https://www.haifa.muni.il/event/rotary-haifa/",
    "ics_url": null,
    "source": "Haifa Municipality",
    "rtl": true,
