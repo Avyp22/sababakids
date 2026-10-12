@@ -1,6 +1,6 @@
 {
  "source": "haifa",
- "generated_at": "2026-10-12T03:33:27.593359+03:00",
+ "generated_at": "2026-10-12T13:51:32.641409+03:00",
  "events": [
   {
    "id": "haifa-1435966-2026-10-15-21:00",
@@ -621,6 +621,30 @@
    "family": true,
    "description": "אמפי ואדי סאליב",
    "ticket_url": "https://www.haifa.muni.il/event/pishpishim-kids/",
+   "ics_url": null,
+   "source": "Haifa Municipality",
+   "rtl": true,
+   "approx": true
+  },
+  {
+   "id": "haifa-1442047-2026-11-02-18:00",
+   "name": "חג הסיגד",
+   "category": "activity",
+   "venue": "בית אבא חושי",
+   "city": "חיפה",
+   "address": "בית אבא חושי",
+   "lat": 32.794,
+   "lng": 34.9896,
+   "image": "https://www.haifa.muni.il/wp-content/uploads/2026/10/חג-הסיגד-361x227.jpg",
+   "time": "18:00",
+   "date": "2026-11-02",
+   "end_date": null,
+   "price": "free",
+   "price_text": null,
+   "ages": [],
+   "family": true,
+   "description": "בית אבא חושי",
+   "ticket_url": "https://www.haifa.muni.il/event/%d7%97%d7%92-%d7%94%d7%a1%d7%99%d7%92%d7%93/",
    "ics_url": null,
    "source": "Haifa Municipality",
    "rtl": true,
