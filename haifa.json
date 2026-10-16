@@ -1,31 +1,7 @@
 {
  "source": "haifa",
- "generated_at": "2026-10-16T19:41:02.953840+03:00",
+ "generated_at": "2026-10-17T00:10:19.956792+03:00",
  "events": [
-  {
-   "id": "haifa-868242-2026-10-16-22:00",
-   "name": "סטנדאפ: אורי ברוייר",
-   "category": "activity",
-   "venue": "בית נגלר",
-   "city": "חיפה",
-   "address": "בית נגלר",
-   "lat": 32.794,
-   "lng": 34.9896,
-   "image": "https://www.haifa.muni.il/wp-content/uploads/2025/01/אורי-ברוייר-קטן-361x227.jpg",
-   "time": "22:00",
-   "date": "2026-10-16",
-   "end_date": null,
-   "price": null,
-   "price_text": null,
-   "ages": [],
-   "family": false,
-   "description": "בית נגלר",
-   "ticket_url": "https://www.haifa.muni.il/event/%d7%a1%d7%98%d7%a0%d7%93%d7%90%d7%a4-%d7%90%d7%95%d7%a8%d7%99-%d7%91%d7%a8%d7%95%d7%99%d7%99%d7%a8-copy/",
-   "ics_url": null,
-   "source": "Haifa Municipality",
-   "rtl": true,
-   "approx": true
-  },
   {
    "id": "haifa-1068999-2026-10-17-21:00",
    "name": "גיא הוכמן - קצין חיוך ראשי",
@@ -1011,7 +987,7 @@
    "approx": true
   },
   {
-   "id": "haifa-1431777-2026-10-16-",
+   "id": "haifa-1431777-2026-10-17-",
    "name": "מצפה כוכבים בלייב ובאור יום",
    "category": "activity",
    "venue": "מדעטק חיפה",
@@ -1021,7 +997,7 @@
    "lng": 34.9896,
    "image": "https://www.haifa.muni.il/wp-content/uploads/2026/09/WhatsApp-Image-2026-09-23-at-12.55.34-361x227.jpeg",
    "time": "",
-   "date": "2026-10-16",
+   "date": "2026-10-17",
    "end_date": "2026-10-31",
    "price": null,
    "price_text": null,
