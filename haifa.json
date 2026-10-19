@@ -1,6 +1,6 @@
 {
  "source": "haifa",
- "generated_at": "2026-10-19T07:42:06.890906+03:00",
+ "generated_at": "2026-10-19T16:17:59.960154+03:00",
  "events": [
   {
    "id": "haifa-1429166-2026-10-19-10:30",
@@ -1245,6 +1245,30 @@
    "family": true,
    "description": "תיאטרון בית 9",
    "ticket_url": "https://www.haifa.muni.il/event/%d7%94%d7%a6%d7%92%d7%aa-%d7%99%d7%9c%d7%93%d7%99%d7%9d-%d7%93%d7%95%d7%95%d7%a7%d7%90-%d7%a7%d7%a4%d7%a7%d7%90/",
+   "ics_url": null,
+   "source": "Haifa Municipality",
+   "rtl": true,
+   "approx": true
+  },
+  {
+   "id": "haifa-1449041-2026-11-14-11:30",
+   "name": "הצגת ילדים: ממלכת הצבעים",
+   "category": "activity",
+   "venue": "מוזיאון העיר",
+   "city": "חיפה",
+   "address": "מוזיאון העיר",
+   "lat": 32.794,
+   "lng": 34.9896,
+   "image": "https://www.haifa.muni.il/wp-content/uploads/2026/10/ממלכת-הצבעים-קרדיט-עודד-צדוק-361x227.jpg",
+   "time": "11:30",
+   "date": "2026-11-14",
+   "end_date": null,
+   "price": null,
+   "price_text": null,
+   "ages": [],
+   "family": true,
+   "description": "מוזיאון העיר",
+   "ticket_url": "https://www.haifa.muni.il/event/%d7%94%d7%a6%d7%92%d7%aa-%d7%99%d7%9c%d7%93%d7%99%d7%9d-%d7%9e%d7%9e%d7%9c%d7%9b%d7%aa-%d7%94%d7%a6%d7%91%d7%a2%d7%99%d7%9d/",
    "ics_url": null,
    "source": "Haifa Municipality",
    "rtl": true,
