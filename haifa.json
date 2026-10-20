@@ -1,6 +1,6 @@
 {
  "source": "haifa",
- "generated_at": "2026-10-20T11:34:25.433668+03:00",
+ "generated_at": "2026-10-20T17:19:47.327306+03:00",
  "events": [
   {
    "id": "haifa-756794-2026-10-23-22:00",
@@ -597,6 +597,30 @@
    "family": false,
    "description": "רחבי העיר",
    "ticket_url": "https://www.haifa.muni.il/event/haifa-bauhaus-week/",
+   "ics_url": null,
+   "source": "Haifa Municipality",
+   "rtl": true,
+   "approx": true
+  },
+  {
+   "id": "haifa-1450345-2026-10-20-",
+   "name": "תערוכה: עושות סצנה",
+   "category": "activity",
+   "venue": "פירמידה - מרכז לאמנות עכשווית",
+   "city": "חיפה",
+   "address": "פירמידה - מרכז לאמנות עכשווית",
+   "lat": 32.794,
+   "lng": 34.9896,
+   "image": "https://www.haifa.muni.il/wp-content/uploads/2026/10/קקדלארט-תערוכה.jpg-361x227.jpeg",
+   "time": "",
+   "date": "2026-10-20",
+   "end_date": "2026-11-21",
+   "price": "free",
+   "price_text": null,
+   "ages": [],
+   "family": false,
+   "description": "פירמידה - מרכז לאמנות עכשווית",
+   "ticket_url": "https://www.haifa.muni.il/event/%d7%aa%d7%a2%d7%a8%d7%95%d7%9b%d7%94-%d7%95%d7%a1%d7%a8%d7%98-%d7%a2%d7%95%d7%a9%d7%95%d7%aa-%d7%a1%d7%a6%d7%a0%d7%94/",
    "ics_url": null,
    "source": "Haifa Municipality",
    "rtl": true,
