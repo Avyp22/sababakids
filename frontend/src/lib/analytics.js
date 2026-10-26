@@ -1,7 +1,7 @@
 // Privacy-friendly usage stats with GoatCounter (no cookies, no personal data,
 // no consent banner needed). Enabled only when REACT_APP_GOATCOUNTER is set at
 // build time, e.g. "sababakids" for https://sababakids.goatcounter.com.
-const CODE = process.env.REACT_APP_GOATCOUNTER;
+const CODE = import.meta.env.REACT_APP_GOATCOUNTER;
 
 export function initAnalytics() {
   if (!CODE || typeof document === "undefined") return;

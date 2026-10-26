@@ -41,6 +41,8 @@ IMG = {
     "event2": "https://images.unsplash.com/photo-1605980045919-4abfbb1c3260?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODF8MHwxfHNlYXJjaHwyfHxwdXBwZXQlMjBzaG93JTIwdGhlYXRlciUyMGtpZHMlMjBldmVudHxlbnwwfHx8fDE3ODg4MDA2MzV8MA&ixlib=rb-4.1.0&q=85",
     "event3": "https://images.unsplash.com/photo-1432639020363-5632f7f04e0b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODF8MHwxfHNlYXJjaHwxfHxwdXBwZXQlMjBzaG93JTIwdGhlYXRlciUyMGtpZHMlMjBldmVudHxlbnwwfHx8fDE3ODg4MDA2MzV8MA&ixlib=rb-4.1.0&q=85",
 }
+# Unsplash serves the multi-MB original unless asked for a size.
+IMG = {k: f"{v}&w=800&auto=format" for k, v in IMG.items()}
 
 ALL_AGES = ["0-2", "3-5", "6-9", "10+"]
 

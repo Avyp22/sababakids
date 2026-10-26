@@ -1,0 +1,21 @@
+# Rebuilds the static site every morning so the SEO city pages (/haifa, /holon...)
+# list the current upcoming events, not the ones from the last code push.
+# Set the repo secret RENDER_STATIC_DEPLOY_HOOK: Render → sababakids (static site)
+# → Settings → Deploy Hook → copy the URL.
+name: refresh-city-pages
+
+on:
+  schedule:
+    - cron: "30 3 * * *"   # 03:30 UTC ≈ 06:30 in Israel
+  workflow_dispatch:
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy
+        env:
+          HOOK: ${{ secrets.RENDER_STATIC_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then echo "RENDER_STATIC_DEPLOY_HOOK not set, skipping"; exit 0; fi
+          curl -fsS -X POST "$HOOK" > /dev/null && echo "deploy triggered"

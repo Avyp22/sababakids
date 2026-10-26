@@ -1,7 +1,7 @@
 // Minimal service worker: makes the app installable and lets it open offline.
 // Pages: network first (always fresh), cached copy when offline.
-// Hashed build assets (/static/...): cache first, they never change.
-const CACHE = "sababakids-v2";
+// Hashed build assets (/assets/...): cache first, they never change.
+const CACHE = "sababakids-v3";
 
 self.addEventListener("install", () => self.skipWaiting());
 
@@ -31,7 +31,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (url.pathname.startsWith("/static/")) {
+  if (url.pathname.startsWith("/assets/")) {
     event.respondWith(
       caches.match(req).then((hit) => hit || fetch(req).then((res) => {
         const copy = res.clone();

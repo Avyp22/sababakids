@@ -24,6 +24,8 @@ services:
         sync: false   # set in the dashboard, never commit it
       - key: ADMIN_KEY
         generateValue: true   # protects /api/reports and /api/hide (see Render > Environment)
+      - key: GOOGLE_DAILY_LIMIT
+        value: "1000"         # max paid Google calls per day (cache hits are free)
 
   - type: web
     name: sababakids
@@ -40,8 +42,6 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "20"
-      - key: CI
-        value: "false"
       - key: REACT_APP_BACKEND_URL
         value: https://sababakids-api.onrender.com
       - key: REACT_APP_GOATCOUNTER

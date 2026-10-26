@@ -82,6 +82,12 @@ def test_search_ages_filter(client):
         assert "0-2" in a["ages"]
 
 
+def test_search_unknown_location_is_404(client):
+    r = client.post(f"{API}/places/search", json={"location": "xyzqwertyuiop"})
+    assert r.status_code == 404
+    assert r.json()["detail"] == "location_not_found"
+
+
 def test_search_by_latlng_jerusalem(client):
     r = client.post(f"{API}/places/search", json={"lat": 31.7683, "lng": 35.2137, "radius_km": 20})
     assert r.status_code == 200

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Heart, Star, MapPin, Navigation, Home, Sun, Clock } from "lucide-react";
 import { CATEGORY_MAP, catLabel } from "@/lib/categories";
 import { useI18n } from "@/lib/i18n";
@@ -8,6 +9,7 @@ export function ActivityCard({ activity, index, isFavorite, onToggleFavorite, on
   const cat = CATEGORY_MAP[activity.category] || CATEGORY_MAP.all;
   const Icon = cat.icon;
   const fav = isFavorite(activity.id);
+  const [imgFailed, setImgFailed] = useState(false);
 
   return (
     <div
@@ -20,14 +22,14 @@ export function ActivityCard({ activity, index, isFavorite, onToggleFavorite, on
       style={{ animationDelay: `${Math.min(index, 12) * 45}ms` }}
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-muted">
-        {activity.image ? (
+        {activity.image && !imgFailed ? (
           <img
             src={activity.image}
             alt={activity.name}
             loading="lazy"
             decoding="async"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            onError={(e) => { e.currentTarget.style.display = "none"; }}
+            onError={() => setImgFailed(true)}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${cat.color}22, ${cat.color}55)` }}>

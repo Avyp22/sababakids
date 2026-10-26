@@ -32,6 +32,17 @@ const URL_CITY = CITIES.find((c) => window.location.pathname.replace(/\/+$/, "")
 
 const DATE_RANGES = ["all", "today", "tomorrow", "weekend", "week"];
 
+// A 5.0 from one review shouldn't beat a 4.7 from 2,000: pull ratings toward 4
+// as if every place also had 10 average reviews. Unrated places go last.
+const ratingScore = (a) => (a.rating ? (a.rating * (a.reviews || 0) + 4 * 10) / ((a.reviews || 0) + 10) : 0);
+
+// Results come sorted by distance; the other orders keep distance as tie-breaker.
+const SORTS = {
+  distance: null,
+  rating: (a, b) => ratingScore(b) - ratingScore(a),
+  open: (a, b) => (b.open_now === true) - (a.open_now === true),
+};
+
 function isoToday() {
   return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jerusalem" });
 }
@@ -74,6 +85,7 @@ export default function Explore() {
   const [gpsLoading, setGpsLoading] = useState(false);
   const [showGpsPrompt, setShowGpsPrompt] = useState(!prefs.location && !URL_CITY);
   const [dateRange, setDateRange] = useState("all");
+  const [sortBy, setSortBy] = useState(prefs.sortBy || "distance");
   const [weather, setWeather] = useState(null);
 
   const [center, setCenter] = useState(DEFAULT_CENTER);
@@ -104,7 +116,9 @@ export default function Explore() {
       if (!gpsCoords) savePrefs({ location: locationInput });
       track("search", `${category}${gpsCoords ? "-gps" : ""}`);
     } catch (e) {
-      toast.error(t("loadError"));
+      const status = e.response?.status;
+      const notFound = e.response?.data?.detail === "location_not_found";
+      toast.error(t(notFound ? "locationNotFound" : status === 429 ? "tooManyRequests" : "loadError"));
     } finally {
       setLoading(false);
     }
@@ -114,7 +128,7 @@ export default function Explore() {
   useEffect(() => { runSearch(); }, [radius, category, ages, setting, price, gpsCoords]); // eslint-disable-line
 
   // Remember the user's usual filters
-  useEffect(() => { savePrefs({ radius, category, ages, familyOnly }); }, [radius, category, ages, familyOnly]);
+  useEffect(() => { savePrefs({ radius, category, ages, familyOnly, sortBy }); }, [radius, category, ages, familyOnly, sortBy]);
 
   // Load events for current center
   useEffect(() => {
@@ -198,7 +212,11 @@ export default function Explore() {
   useEffect(() => {
     if (URL_CITY) document.title = `${t("cityTitle", { city: URL_CITY[document.documentElement.lang] || URL_CITY.en })} | SababaKids`;
   }, [t]);
-  const gridData = tab === "saved" ? favorites : activities;
+  const sortedActivities = useMemo(
+    () => (SORTS[sortBy] ? [...activities].sort(SORTS[sortBy]) : activities),
+    [activities, sortBy]
+  );
+  const gridData = tab === "saved" ? favorites : sortedActivities;
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
@@ -270,7 +288,22 @@ export default function Explore() {
             ) : loading ? (
               <span className="flex items-center gap-1.5"><Loader2 className="w-3.5 h-3.5 animate-spin" /> {t("searching")}</span>
             ) : (
-              <span>{t("activitiesNear", { n: activities.length, place: centerLabel })}</span>
+              <span className="flex items-center gap-2 flex-wrap">
+                {t("activitiesNear", { n: activities.length, place: centerLabel })}
+                {tab === "list" && activities.length > 1 && (
+                  <select
+                    value={sortBy}
+                    onChange={(e) => { setSortBy(e.target.value); track("sort", e.target.value); }}
+                    aria-label={t("sortLabel")}
+                    data-testid="sort-select"
+                    className="h-8 rounded-xl border border-border bg-background px-2 text-xs font-semibold text-foreground"
+                  >
+                    {Object.keys(SORTS).map((k) => (
+                      <option key={k} value={k}>{t(`sort${k[0].toUpperCase()}${k.slice(1)}`)}</option>
+                    ))}
+                  </select>
+                )}
+              </span>
             )}
           </div>
         </div>

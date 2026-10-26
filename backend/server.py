@@ -7,6 +7,7 @@ import os
 import re
 import json
 import hashlib
+import hmac
 import time
 import asyncio
 import math
@@ -186,6 +187,74 @@ geocode_cache = Cache("geocode", 30 * 86400, _geocode_cache)
 
 INDOOR_CATEGORIES = {"museum", "aquarium", "indoor_play"}
 
+# Google gives no price or age range: infer them from the category.
+FREE_CATEGORIES = {"park", "playground", "beach", "nature"}
+ALL_AGES = ["0-2", "3-5", "6-9", "10+"]
+CATEGORY_AGES = {
+    "playground": ["0-2", "3-5", "6-9"],
+    "indoor_play": ["0-2", "3-5", "6-9"],
+    "museum": ["3-5", "6-9", "10+"],
+    "amusement_park": ["3-5", "6-9", "10+"],
+    "water_park": ["3-5", "6-9", "10+"],
+}
+
+
+# ---------- Abuse protection ----------
+
+def client_ip(request: Request):
+    """Real visitor IP. Render sits behind Cloudflare, which overwrites these two
+    headers; X-Forwarded-For can be pre-filled by the client, so it's last resort."""
+    for h in ("cf-connecting-ip", "true-client-ip"):
+        if request.headers.get(h):
+            return request.headers[h].strip()
+    xff = request.headers.get("x-forwarded-for", "")
+    return xff.split(",")[0].strip() or (request.client.host if request.client else "")
+
+
+class RateLimiter:
+    """At most `limit` requests per `window_s` seconds per key (in memory)."""
+
+    def __init__(self, limit, window_s):
+        self.limit, self.window, self.hits = limit, window_s, {}
+
+    def allow(self, key):
+        now = time.time()
+        if len(self.hits) > 10000:   # drop idle keys
+            self.hits = {k: v for k, v in self.hits.items() if v and now - v[-1] < self.window}
+        recent = [t for t in self.hits.get(key, []) if now - t < self.window]
+        if len(recent) >= self.limit:
+            self.hits[key] = recent
+            return False
+        recent.append(now)
+        self.hits[key] = recent
+        return True
+
+
+search_limiter = RateLimiter(30, 60)        # searches per IP per minute
+report_limiter = RateLimiter(10, 3600)      # reports per IP per hour
+photo_limiter = RateLimiter(300, 60)        # photos per IP per minute
+
+
+def check_rate(limiter, request: Request):
+    if not limiter.allow(client_ip(request)):
+        raise HTTPException(status_code=429, detail="too_many_requests")
+
+
+# Hard cap on paid Google calls per day (Israel time), whoever makes them:
+# protects the bill even against bots that rotate IPs. Cache hits don't count.
+GOOGLE_DAILY_LIMIT = int(os.environ.get("GOOGLE_DAILY_LIMIT", "1000"))
+_google_budget = {"day": None, "used": 0}
+
+
+def google_budget_take():
+    today = datetime.now(ZoneInfo("Asia/Jerusalem")).date()
+    if _google_budget["day"] != today:
+        _google_budget.update(day=today, used=0)
+    if _google_budget["used"] >= GOOGLE_DAILY_LIMIT:
+        return False
+    _google_budget["used"] += 1
+    return True
+
 
 # ---------- Models ----------
 
@@ -214,7 +283,9 @@ async def geocode(req: SearchRequest):
     if "," in text:
         parts = text.split(",")
         try:
-            return float(parts[0]), float(parts[1]), text
+            la, ln = float(parts[0]), float(parts[1])
+            if -90 <= la <= 90 and -180 <= ln <= 180:
+                return la, ln, text
         except ValueError:
             pass
 
@@ -227,24 +298,28 @@ async def geocode(req: SearchRequest):
     if cached:
         return tuple(cached)
 
-    if GOOGLE_KEY:
-        try:
-            async with httpx.AsyncClient(timeout=12) as hc:
-                r = await hc.get(
-                    "https://maps.googleapis.com/maps/api/geocode/json",
-                    params={"address": text, "region": "il", "key": GOOGLE_KEY},
-                )
-                data = r.json()
-                if data.get("status") == "OK" and data.get("results"):
-                    loc = data["results"][0]["geometry"]["location"]
-                    result = (loc["lat"], loc["lng"], data["results"][0]["formatted_address"])
-                    await geocode_cache.put(key, list(result))
-                    return result
-        except Exception as e:
-            logger.warning(f"Geocode failed: {e}")
-
-    c = CITY_COORDS["tel aviv"]
-    return c[0], c[1], "Tel Aviv"
+    if not GOOGLE_KEY:
+        return None
+    if not google_budget_take():
+        raise HTTPException(status_code=503, detail="google_daily_limit")
+    try:
+        async with httpx.AsyncClient(timeout=12) as hc:
+            r = await hc.get(
+                "https://maps.googleapis.com/maps/api/geocode/json",
+                params={"address": text, "components": "country:IL", "key": GOOGLE_KEY},
+            )
+            data = r.json()
+    except Exception as e:
+        logger.warning(f"Geocode failed: {e}")
+        raise HTTPException(status_code=503, detail="geocode_unavailable")
+    results = data.get("results") or []
+    # Gibberish restricted to Israel comes back as the whole country: not a match.
+    if data.get("status") != "OK" or not results or "country" in results[0].get("types", []):
+        return None
+    loc = results[0]["geometry"]["location"]
+    result = (loc["lat"], loc["lng"], results[0]["formatted_address"])
+    await geocode_cache.put(key, list(result))
+    return result
 
 
 # ---------- Google Places ----------
@@ -320,6 +395,8 @@ async def google_places(hc, mode, value, fallback_cat, lat, lng, radius_m, photo
     cache_key = (url, str(value), round(lat, 2), round(lng, 2), radius_m, PLACES_FIELD_MASK)
     data = await places_cache.get(cache_key)
     if data is None:
+        if not google_budget_take():
+            raise RuntimeError("daily limit reached")
         try:
             r = await hc.post(url, headers=headers, json=body)
         except httpx.HTTPError as e:
@@ -363,10 +440,10 @@ async def google_places(hc, mode, value, fallback_cat, lat, lng, radius_m, photo
             "rating": p.get("rating"),
             "reviews": p.get("userRatingCount", 0),
             "image": photo,
-            "description": "Live result from Google Places.",
-            "ages": ["0-2", "3-5", "6-9", "10+"],
+            "description": "",
+            "ages": CATEGORY_AGES.get(cat, ALL_AGES),
             "setting": "indoor" if cat in INDOOR_CATEGORIES else "outdoor",
-            "price": None,
+            "price": "free" if cat in FREE_CATEGORIES else None,
             "hours": hours_text,
             "open_now": open_now,
             "features": [],
@@ -400,11 +477,14 @@ async def health(deep: bool = False):
 
 
 @api_router.get("/photo/{name:path}")
-async def place_photo(name: str):
+async def place_photo(name: str, request: Request):
     if not GOOGLE_KEY or not PHOTO_NAME_RE.match(name):
         raise HTTPException(status_code=404, detail="Photo not found")
     uri = await photo_cache.get(name)
     if uri is None:
+        check_rate(photo_limiter, request)
+        if not google_budget_take():
+            raise HTTPException(status_code=404, detail="Photo not found")
         async with httpx.AsyncClient(timeout=10) as hc:
             r = await hc.get(
                 f"https://places.googleapis.com/v1/{name}/media",
@@ -420,7 +500,11 @@ async def place_photo(name: str):
 
 @api_router.post("/places/search")
 async def search_places(req: SearchRequest, request: Request):
-    lat, lng, resolved = await geocode(req)
+    check_rate(search_limiter, request)
+    geo = await geocode(req)
+    if geo is None:
+        raise HTTPException(status_code=404, detail="location_not_found")
+    lat, lng, resolved = geo
     radius_m = req.radius_km * 1000
 
     results = []
@@ -554,6 +638,13 @@ def get_events(  # sync: FastAPI runs it in a threadpool so blocking scrapes don
     return {"count": len(out), "live_sources": live_sources, "events": out}
 
 
+@api_router.get("/curated")
+def get_curated():
+    """Curated places only (no Google call): used by the build to fill the SEO city pages."""
+    keys = ("id", "name", "category", "city", "address", "lat", "lng", "description", "image", "price", "ages")
+    return {"activities": [{k: a.get(k) for k in keys} for a in ACTIVITIES if a["id"] not in HIDDEN_IDS]}
+
+
 @api_router.get("/sources")
 def get_sources(refresh: bool = False):
     """Health of each event connector (used by the daily monitoring workflow)."""
@@ -562,7 +653,9 @@ def get_sources(refresh: bool = False):
 
 # ---------- Reports ("this place/event is wrong") ----------
 
-REPORT_HIDE_THRESHOLD = 3          # distinct reporters before an item is hidden
+# Reports never hide anything by themselves (a single person could fake several
+# reporters): past the threshold the item is flagged for the admin, who hides it.
+REPORT_FLAG_THRESHOLD = 3          # distinct reporters before an item is flagged
 ADMIN_KEY = os.environ.get("ADMIN_KEY", "").strip()
 HIDDEN_IDS = set()                 # loaded from Mongo; applied to places and events
 _reports_mem = []                  # fallback when no database is configured
@@ -576,9 +669,16 @@ class ReportRequest(BaseModel):
     comment: str = Field(default="", max_length=500)
 
 
+def require_admin(request: Request):
+    """Admin key from the X-Admin-Key header (kept out of server logs); the
+    ?key= query parameter still works for quick checks from a browser."""
+    key = request.headers.get("x-admin-key") or request.query_params.get("key", "")
+    if not ADMIN_KEY or not hmac.compare_digest(key, ADMIN_KEY):
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+
 def _reporter_hash(request: Request):
-    ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "")
-    return hashlib.sha256(f"{ip.split(',')[0].strip()}|{ADMIN_KEY}".encode()).hexdigest()[:16]
+    return hashlib.sha256(f"{client_ip(request)}|{ADMIN_KEY}".encode()).hexdigest()[:16]
 
 
 async def load_hidden_ids():
@@ -593,6 +693,7 @@ async def load_hidden_ids():
 
 @api_router.post("/report")
 async def report_item(rep: ReportRequest, request: Request):
+    check_rate(report_limiter, request)
     doc = {**rep.model_dump(), "reporter": _reporter_hash(request), "at": datetime.now(timezone.utc).isoformat()}
     if db is None:
         _reports_mem.append(doc)
@@ -602,10 +703,11 @@ async def report_item(rep: ReportRequest, request: Request):
         await db.reports.update_one(
             {"item_id": rep.item_id, "reporter": doc["reporter"]}, {"$set": doc}, upsert=True)
         distinct = len(await db.reports.distinct("reporter", {"item_id": rep.item_id}))
-        if distinct >= REPORT_HIDE_THRESHOLD:
-            await db.hidden.update_one({"_id": rep.item_id},
-                                       {"$set": {"name": rep.name, "kind": rep.kind, "auto": True}}, upsert=True)
-            HIDDEN_IDS.add(rep.item_id)
+        if distinct >= REPORT_FLAG_THRESHOLD and rep.item_id not in HIDDEN_IDS:
+            await db.flagged.update_one(
+                {"_id": rep.item_id},
+                {"$set": {"name": rep.name, "kind": rep.kind, "reporters": distinct, "at": doc["at"]}},
+                upsert=True)
     except Exception as e:
         logger.warning(f"Saving report failed: {e}")
         return {"ok": False}
@@ -613,22 +715,22 @@ async def report_item(rep: ReportRequest, request: Request):
 
 
 @api_router.get("/reports")
-async def list_reports(key: str = ""):
-    """Admin view: /api/reports?key=ADMIN_KEY"""
-    if not ADMIN_KEY or key != ADMIN_KEY:
-        raise HTTPException(status_code=403, detail="Forbidden")
+async def list_reports(request: Request):
+    """Admin view: GET /api/reports with header X-Admin-Key: ADMIN_KEY"""
+    require_admin(request)
     if db is None:
-        return {"reports": _reports_mem[-200:], "hidden": sorted(HIDDEN_IDS)}
+        return {"flagged": [], "reports": _reports_mem[-200:], "hidden": sorted(HIDDEN_IDS)}
+    flagged = [{"item_id": d.pop("_id"), **d}
+               async for d in db.flagged.find().sort("reporters", -1).limit(100)]
     reports = [{k: v for k, v in d.items() if k != "_id"}
                async for d in db.reports.find().sort("at", -1).limit(300)]
-    return {"reports": reports, "hidden": sorted(HIDDEN_IDS)}
+    return {"flagged": flagged, "reports": reports, "hidden": sorted(HIDDEN_IDS)}
 
 
 @api_router.post("/hide")
-async def hide_item(item_id: str, key: str = "", unhide: bool = False):
-    """Admin: hide/unhide an item right away. /api/hide?item_id=...&key=ADMIN_KEY"""
-    if not ADMIN_KEY or key != ADMIN_KEY:
-        raise HTTPException(status_code=403, detail="Forbidden")
+async def hide_item(item_id: str, request: Request, unhide: bool = False):
+    """Admin: hide/unhide an item right away. POST /api/hide?item_id=... (X-Admin-Key header)"""
+    require_admin(request)
     if unhide:
         HIDDEN_IDS.discard(item_id)
         if db is not None:
@@ -637,6 +739,8 @@ async def hide_item(item_id: str, key: str = "", unhide: bool = False):
         HIDDEN_IDS.add(item_id)
         if db is not None:
             await db.hidden.update_one({"_id": item_id}, {"$set": {"auto": False}}, upsert=True)
+    if db is not None:
+        await db.flagged.delete_one({"_id": item_id})   # reviewed either way
     return {"ok": True, "hidden": not unhide}
 
 

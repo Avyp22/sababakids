@@ -89,10 +89,22 @@ Sans MongoDB tout marche, mais le cache Google repart de zéro à chaque redéma
 
 ### Signalements
 - Bouton « Signaler un problème » sur chaque lieu et événement.
-- 3 signalements de personnes différentes → l'élément est masqué automatiquement (nécessite MongoDB).
-- Consulter : `https://sababakids-api.onrender.com/api/reports?key=<ADMIN_KEY>` (ADMIN_KEY générée par Render → sababakids-api → Environment).
-- Masquer / réafficher tout de suite : `POST /api/hide?item_id=<id>&key=<ADMIN_KEY>` (ajouter `&unhide=true` pour réafficher).
+- 3 signalements de personnes différentes → l'élément passe dans la liste `flagged` **à vérifier** (nécessite MongoDB). Rien n'est masqué automatiquement : une seule personne pourrait se faire passer pour plusieurs.
+- La clé admin (ADMIN_KEY, générée par Render → sababakids-api → Environment) passe de préférence dans l'en-tête `X-Admin-Key`, pour ne pas apparaître dans les journaux du serveur. `?key=` marche encore, mais à éviter.
+- Consulter (regarder d'abord `flagged`) :
+  `curl -H "X-Admin-Key: <ADMIN_KEY>" https://sababakids-api.onrender.com/api/reports`
+- Masquer :
+  `curl -X POST -H "X-Admin-Key: <ADMIN_KEY>" "https://sababakids-api.onrender.com/api/hide?item_id=<id>"`
+  Réafficher, ou écarter un signalement injustifié : ajouter `&unhide=true`. Dans les deux cas l'élément sort de `flagged`.
+- Limite : 10 signalements par heure et par visiteur.
+
+### Protection du quota Google
+- 30 recherches par minute et par visiteur (au-delà : message « trop de recherches »).
+- Plafond global d'appels Google payants par jour : variable `GOOGLE_DAILY_LIMIT` (défaut 1000) sur **sababakids-api**. Une fois atteint, le site affiche seulement la sélection SababaKids jusqu'à minuit (heure d'Israël). Les résultats déjà en cache ne comptent pas.
+- En plus, fixer un plafond dans Google Cloud Console → APIs & Services → Places API (New) → Quotas : c'est la seule vraie garantie sur la facture.
 
 ### Référencement
-- Pages par ville : `/tel-aviv`, `/haifa`, `/holon`, `/jerusalem`… (liste : `frontend/src/lib/cities.json`), générées au build.
+- Pages par ville : `/tel-aviv`, `/haifa`, `/holon`, `/jerusalem`… (liste : `frontend/src/lib/cities.json`), générées au build. Le build interroge l'API : chaque page liste les lieux de la sélection SababaKids proches et les prochains événements familiaux, avec les données `Event` de schema.org pour que Google puisse les afficher dans ses résultats. Si l'API ne répond pas, la page est construite quand même, avec le texte générique.
+- Événements à jour sur ces pages : la tâche GitHub `refresh-city-pages` relance le build chaque matin. À activer une fois : Render → **sababakids** (site statique) → Settings → Deploy Hook → copier l'URL → GitHub → Settings → Secrets and variables → Actions → **New repository secret** `RENDER_STATIC_DEPLOY_HOOK`.
+- Nom de domaine personnalisé (ex. sababakids.co.il) : l'ajouter dans Render → sababakids → Settings → Custom Domains, puis mettre la variable `PUBLIC_SITE_URL=https://sababakids.co.il` sur le site statique (URLs canoniques et sitemap), remplacer `og:url`, `canonical` et `og:image` dans `frontend/index.html`, ajouter le domaine à `CORS_ORIGINS` du backend, et redéclarer le site dans Search Console. Le faire tôt : changer de domaine plus tard fait perdre le référencement acquis.
 - Google Search Console : <https://search.google.com/search-console> → ajouter le site → soumettre `https://sababakids.onrender.com/sitemap.xml`.

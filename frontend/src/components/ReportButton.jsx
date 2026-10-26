@@ -24,8 +24,8 @@ export function ReportButton({ itemId, kind, name, className }) {
       toast.success(t("reportThanks"));
       setOpen(false);
       setComment("");
-    } catch {
-      toast.error(t("loadError"));
+    } catch (e) {
+      toast.error(t(e.response?.status === 429 ? "tooManyRequests" : "loadError"));
     } finally {
       setSending(false);
     }

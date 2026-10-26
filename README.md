@@ -3,7 +3,7 @@
 Find kid- & family-friendly **activities and events near you in Israel** within a chosen radius — by city/address or GPS. Places come live from **Google Places** plus a small curated list of well-known places; events combine a **national ticketing site (Leaan)** and the event boards of the **Modi'in, Holon and Haifa municipalities**. UI in Hebrew (RTL), French and English; installable as a PWA.
 
 ## Tech stack
-- **Frontend**: React (CRA + CRACO) · Tailwind · shadcn/ui · Leaflet maps
+- **Frontend**: React (Vite) · Tailwind · shadcn/ui · Leaflet maps
 - **Backend**: FastAPI · MongoDB (Motor) · httpx
 - **Data**: Google Places (New) + Geocoding · leaan.co.il · modiin.muni.il · holon.muni.il · haifa.muni.il
 - **Monitoring**: `GET /api/sources` + daily GitHub Action `check-event-sources`
@@ -62,5 +62,7 @@ Create `frontend/.env` with `REACT_APP_BACKEND_URL=http://localhost:8001`.
 | backend | `DB_NAME` | Database name |
 | backend | `CORS_ORIGINS` | Comma-separated allowed origins |
 | backend | `GOOGLE_MAPS_API_KEY` | Google Places (New) + Geocoding API key |
+| backend | `GOOGLE_DAILY_LIMIT` | Max paid Google calls per day (default 1000) |
+| backend | `ADMIN_KEY` | Protects `/api/reports` and `/api/hide` (send it as `X-Admin-Key`) |
 
 > Secrets are **not** committed. Copy `*.env.example` files to `.env` and fill in your values.
