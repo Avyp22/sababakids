@@ -1,6 +1,6 @@
 {
  "source": "haifa",
- "generated_at": "2026-10-26T01:17:36.348295+02:00",
+ "generated_at": "2026-10-26T06:48:50.637640+02:00",
  "events": [
   {
    "id": "haifa-651731-2026-10-26-20:30",
@@ -549,6 +549,30 @@
    "family": false,
    "description": "תיאטרון חיפה",
    "ticket_url": "https://www.haifa.muni.il/event/%d7%a7%d7%95%d7%9e%d7%93%d7%99%d7%94-%d7%a6%d7%a8%d7%a4%d7%aa%d7%99%d7%aa-%d7%9e%d7%a4%d7%aa%d7%99%d7%a2%d7%94-%d7%a4%d7%a8%d7%99%d7%93%d7%95%d7%aa-%d7%91%d7%a2%d7%9e/",
+   "ics_url": null,
+   "source": "Haifa Municipality",
+   "rtl": true,
+   "approx": true
+  },
+  {
+   "id": "haifa-1397955-2026-11-03-20:30",
+   "name": "הצגה: היה לנו עולם",
+   "category": "show",
+   "venue": "תיאטרון חיפה",
+   "city": "חיפה",
+   "address": "תיאטרון חיפה",
+   "lat": 32.794,
+   "lng": 34.9896,
+   "image": "https://www.haifa.muni.il/wp-content/uploads/2026/08/היה-לנו-עולם-361x227.jpg",
+   "time": "20:30",
+   "date": "2026-11-03",
+   "end_date": null,
+   "price": null,
+   "price_text": null,
+   "ages": [],
+   "family": false,
+   "description": "תיאטרון חיפה",
+   "ticket_url": "https://www.haifa.muni.il/event/%d7%94%d7%a6%d7%92%d7%94-%d7%94%d7%99%d7%94-%d7%9c%d7%a0%d7%95-%d7%a2%d7%95%d7%9c%d7%9d/",
    "ics_url": null,
    "source": "Haifa Municipality",
    "rtl": true,
