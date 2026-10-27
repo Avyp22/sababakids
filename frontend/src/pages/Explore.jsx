@@ -7,7 +7,7 @@ import { ActivityCard } from "@/components/ActivityCard";
 import { ActivityDetail } from "@/components/ActivityDetail";
 import { EventsView } from "@/components/EventsView";
 import { searchActivities, getEvents } from "@/lib/api";
-import { useFavorites, useTheme, loadPrefs, savePrefs } from "@/lib/store";
+import { useFavorites, useTheme, loadPrefs, savePrefs, loadLastSearch, saveLastSearch } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -88,7 +88,7 @@ export default function Explore() {
   const [sortBy, setSortBy] = useState(prefs.sortBy || "distance");
   const [weather, setWeather] = useState(null);
 
-  const [center, setCenter] = useState(DEFAULT_CENTER);
+  const [center, setCenter] = useState(null);   // known once the first search answers
   const [activities, setActivities] = useState([]);
   const [events, setEvents] = useState([]);
   const [eventSources, setEventSources] = useState([]);
@@ -98,28 +98,42 @@ export default function Explore() {
   const [selected, setSelected] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [googleDown, setGoogleDown] = useState(false);
+  const [slow, setSlow] = useState(false);   // free backend waking up
 
   const toggleAge = (id) =>
     setAges((prev) => (prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]));
 
   const runSearch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const payload = {
-        radius_km: radius, category, ages, setting, price,
-        ...(gpsCoords ? { lat: gpsCoords.lat, lng: gpsCoords.lng } : { location: locationInput }),
-      };
-      const data = await searchActivities(payload);
+    const payload = {
+      radius_km: radius, category, ages, setting, price,
+      ...(gpsCoords ? { lat: gpsCoords.lat, lng: gpsCoords.lng } : { location: locationInput }),
+    };
+    const applyResults = (data) => {
       setActivities(data.activities);
       setCenter(data.center);
       setGoogleDown(!data.google_enabled || (data.google_errors || []).length > 0);
+    };
+    // Same search as last time: show it right away, refresh in the background.
+    const cacheKey = JSON.stringify(payload);
+    const cached = loadLastSearch(cacheKey);
+    if (cached) applyResults(cached);
+    setLoading(!cached);
+    const slowTimer = setTimeout(() => setSlow(true), 4000);
+    try {
+      const data = await searchActivities(payload);
+      applyResults(data);
+      saveLastSearch(cacheKey, data);
       if (!gpsCoords) savePrefs({ location: locationInput });
       track("search", `${category}${gpsCoords ? "-gps" : ""}`);
     } catch (e) {
       const status = e.response?.status;
       const notFound = e.response?.data?.detail === "location_not_found";
-      toast.error(t(notFound ? "locationNotFound" : status === 429 ? "tooManyRequests" : "loadError"));
+      if (notFound || !cached) {
+        toast.error(t(notFound ? "locationNotFound" : status === 429 ? "tooManyRequests" : "loadError"));
+      }
     } finally {
+      clearTimeout(slowTimer);
+      setSlow(false);
       setLoading(false);
     }
   }, [radius, category, ages, setting, price, gpsCoords, locationInput, t]);
@@ -132,6 +146,7 @@ export default function Explore() {
 
   // Load events for current center
   useEffect(() => {
+    if (!center) return;
     let active = true;
     setEventsLoading(true);
     getEvents({ lat: center.lat, lng: center.lng, radius_km: Math.max(radius * 3, 60), family_only: familyOnly })
@@ -139,7 +154,7 @@ export default function Explore() {
       .catch(() => {})
       .finally(() => { if (active) setEventsLoading(false); });
     return () => { active = false; };
-  }, [center.lat, center.lng, familyOnly]); // eslint-disable-line
+  }, [center?.lat, center?.lng, familyOnly]); // eslint-disable-line
 
   const handleUseGps = useCallback((silent = false) => {
     if (!navigator.geolocation) {
@@ -191,14 +206,16 @@ export default function Explore() {
     toast.success(t("shareOpening"));
   };
 
-  const centerLabel = center.label === "Your location" ? t("yourLocation") : center.label;
+  const centerLabel = !center ? locationInput
+    : center.label === "Your location" ? t("yourLocation") : center.label;
 
   // Weather for the searched area (Open-Meteo, free).
   useEffect(() => {
     let active = true;
+    if (!center) return;
     getWeather(center.lat, center.lng).then((w) => active && setWeather(w)).catch(() => {});
     return () => { active = false; };
-  }, [center.lat, center.lng]);
+  }, [center?.lat, center?.lng]); // eslint-disable-line
   const advice = weatherAdvice(weather);
 
   const shownEvents = useMemo(() => {
@@ -286,7 +303,7 @@ export default function Explore() {
             ) : tab === "saved" ? (
               <span>{t("savedCount", { n: favorites.length })}</span>
             ) : loading ? (
-              <span className="flex items-center gap-1.5"><Loader2 className="w-3.5 h-3.5 animate-spin" /> {t("searching")}</span>
+              <span className="flex items-center gap-1.5"><Loader2 className="w-3.5 h-3.5 animate-spin" /> {t(slow ? "serverWaking" : "searching")}</span>
             ) : (
               <span className="flex items-center gap-2 flex-wrap">
                 {t("activitiesNear", { n: activities.length, place: centerLabel })}
@@ -400,7 +417,7 @@ export default function Explore() {
         {/* Content */}
         {tab === "map" ? (
           <Suspense fallback={<div className="h-[420px] rounded-3xl bg-muted animate-pulse" />}>
-            <MapView center={center} activities={activities} onOpen={openDetail} />
+            <MapView center={center || DEFAULT_CENTER} activities={activities} onOpen={openDetail} />
           </Suspense>
         ) : tab === "events" ? (
           <EventsView events={shownEvents} loading={eventsLoading} familyOnly={familyOnly} />

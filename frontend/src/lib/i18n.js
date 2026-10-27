@@ -9,6 +9,7 @@ export const LANGS = [
 
 const STRINGS = {
   en: {
+    serverWaking: "Waking up the server, a few more seconds…",
     sortLabel: "Sort by",
     sortDistance: "Nearest",
     sortRating: "Best rated",
@@ -116,6 +117,7 @@ const STRINGS = {
     cityTitle: "Kids activities in {city}",
   },
   fr: {
+    serverWaking: "Le serveur se réveille, encore quelques secondes…",
     sortLabel: "Trier par",
     sortDistance: "Plus proches",
     sortRating: "Mieux notés",
@@ -223,6 +225,7 @@ const STRINGS = {
     cityTitle: "Activités pour enfants à {city}",
   },
   he: {
+    serverWaking: "השרת מתעורר, עוד כמה שניות…",
     sortLabel: "מיון לפי",
     sortDistance: "הכי קרוב",
     sortRating: "דירוג גבוה",

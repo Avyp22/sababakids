@@ -27,6 +27,20 @@ export function savePrefs(patch) {
   writeJson(PREFS_KEY, { ...loadPrefs(), ...patch });
 }
 
+// Last search response, shown instantly on the next visit while the (possibly
+// sleeping) backend answers. Only one entry is kept.
+const LAST_SEARCH_KEY = "sababakids_last_search";
+const LAST_SEARCH_MAX_AGE_MS = 24 * 3600 * 1000;
+
+export function loadLastSearch(key) {
+  const hit = readJson(LAST_SEARCH_KEY, null);
+  return hit && hit.key === key && Date.now() - hit.at < LAST_SEARCH_MAX_AGE_MS ? hit.data : null;
+}
+
+export function saveLastSearch(key, data) {
+  writeJson(LAST_SEARCH_KEY, { key, at: Date.now(), data });
+}
+
 export function useFavorites() {
   const [favorites, setFavorites] = useState(() => readJson(FAV_KEY, []));
 
