@@ -58,3 +58,15 @@ def test_clinic_named_maayan_is_not_nature():
     assert not _is_natural({"primaryType": "doctor", "types": ["doctor", "health"]})
     assert _is_natural({"primaryType": "park", "types": ["park"]})
     assert _is_natural({"primaryType": "tourist_attraction", "types": ["tourist_attraction", "natural_feature"]})
+
+
+def test_rage_room_is_excluded():
+    p = {"displayName": {"text": "חדר זעם - 2Break"}, "primaryType": "amusement_center",
+         "types": ["amusement_center"], "formattedAddress": "Tel Aviv"}
+    assert _is_excluded(p)
+
+
+def test_family_place_with_break_in_name_is_kept():
+    p = {"displayName": {"text": "Breakfast Park"}, "primaryType": "park", "types": ["park"],
+         "formattedAddress": "Haifa"}
+    assert not _is_excluded(p)

@@ -3,8 +3,10 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import {
-  Heart, Star, MapPin, Clock, Navigation, ExternalLink, Check,
+  Heart, Star, MapPin, Clock, Navigation, ExternalLink, Check, Share2,
 } from "lucide-react";
+import { toast } from "sonner";
+import { track } from "@/lib/analytics";
 import { CATEGORY_MAP, catLabel } from "@/lib/categories";
 import { SettingBadge, PriceBadge, OpenNowBadge, SourceTag } from "@/components/ActivityCard";
 import { useI18n, FEATURE_LABELS } from "@/lib/i18n";
@@ -24,6 +26,25 @@ export function ActivityDetail({ activity, open, onClose, isFavorite, onToggleFa
   // Curated descriptions are English-only; Google results get a translated line.
   const description = activity.source === "google" ? t("googleResult") : activity.description;
   const hours = activity.source === "google" && activity.hours === "See Google Maps for hours" ? null : activity.hours;
+
+  // Phone share sheet when available (WhatsApp, SMS...), otherwise copy the text.
+  const share = async () => {
+    const text = `${activity.name}${activity.address ? ` — ${activity.address}` : ""}
+${mapsUrl}
+
+${t("sharePlaceIntro")} ${window.location.origin}`;
+    track("share", activity.category);
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: activity.name, text });
+        return;
+      }
+      await navigator.clipboard.writeText(text);
+      toast.success(t("shareCopied"));
+    } catch (e) {
+      if (e?.name !== "AbortError") window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+    }
+  };
 
   return (
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
@@ -137,6 +158,10 @@ export function ActivityDetail({ activity, open, onClose, isFavorite, onToggleFa
               </a>
             </Button>
           </div>
+
+          <Button variant="outline" className="w-full rounded-xl h-11 gap-2" onClick={share} data-testid="detail-share-btn">
+            <Share2 className="w-4 h-4" /> {t("sharePlace")}
+          </Button>
 
           <div className="flex justify-between items-start gap-3 flex-wrap">
             <ReportButton itemId={activity.id} kind="place" name={activity.name} />

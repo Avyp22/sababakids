@@ -340,6 +340,9 @@ EXCLUDED_PRIMARY_TYPES = {
 EXCLUDED_NAME_WORDS = [
     "בית עלמין", "בית קברות", "בית העלמין", "קברות", "cemetery", "graveyard", "memorial park",
     "בית כנסת", "synagogue", "church", "כנסיה", "mosque", "מסגד",
+    # Adult-only outings that Google files as amusement/indoor play
+    "חדר זעם", "חדרי זעם", "rage room", "smash room", "anger room", "break room",
+    "פיינטבול", "paintball", "קזינו", "casino", "פאב",
 ]
 # Misclassified by Google and not caught by the rules above; add a place id
 # here when a user reports one.

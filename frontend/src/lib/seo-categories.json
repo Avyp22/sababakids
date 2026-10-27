@@ -1,0 +1,20 @@
+[
+  {"id": "park", "slug": "parks", "he": "פארקים וגנים", "fr": "Parcs", "en": "Parks",
+   "intro": "פארקים וגנים ציבוריים ליד {city}: מדשאות לריצה, צל, פינות פיקניק ושבילים לעגלות ולאופניים."},
+  {"id": "playground", "slug": "playgrounds", "he": "גני שעשועים", "fr": "Aires de jeux", "en": "Playgrounds",
+   "intro": "גני שעשועים ב{city} ובסביבה, לפי מרחק מכם: מתקנים לפעוטות ולילדים גדולים, רבים מהם מוצלים."},
+  {"id": "beach", "slug": "beaches", "he": "חופים", "fr": "Plages", "en": "Beaches", "coastal": true,
+   "intro": "חופים ידידותיים למשפחות ב{city}: חופים מוכרזים עם מציל, מקלחות וחניה, ומים רדודים לקטנים."},
+  {"id": "nature", "slug": "nature", "he": "טבע ומעיינות", "fr": "Nature et sources", "en": "Nature & springs",
+   "intro": "מעיינות, נחלים ושמורות טבע קרוב ל{city}: טיולים קצרים עם ילדים ומקומות לטבול בהם את הרגליים."},
+  {"id": "museum", "slug": "museums", "he": "מוזיאונים לילדים", "fr": "Musées pour enfants", "en": "Kids museums",
+   "intro": "מוזיאונים ב{city} ובסביבה שמתאימים לילדים: תערוכות אינטראקטיביות, מדע וסדנאות, ובעיקר מזגן ביום חם."},
+  {"id": "zoo", "slug": "zoos", "he": "גני חיות", "fr": "Zoos", "en": "Zoos",
+   "intro": "גני חיות, פינות ליטוף וחוות ליד {city}: יום בחוץ עם בעלי חיים, לכל הגילים."},
+  {"id": "water_park", "slug": "water-parks", "he": "פארקי מים", "fr": "Parcs aquatiques", "en": "Water parks",
+   "intro": "פארקי מים ובריכות לילדים קרוב ל{city}: מגלשות, בריכות פעוטות ומקום להתקרר בקיץ."},
+  {"id": "amusement_park", "slug": "amusement-parks", "he": "לונה פארקים", "fr": "Parcs d'attractions", "en": "Amusement parks",
+   "intro": "לונה פארקים ופארקי שעשועים ליד {city}: מתקנים לקטנים וגם לגדולים."},
+  {"id": "indoor_play", "slug": "indoor-play", "he": "משחקיות", "fr": "Jeux en intérieur", "en": "Indoor play",
+   "intro": "משחקיות, מתחמי קפיצה ופעילויות מקורות ב{city}: מושלם לימי גשם ולשעות החמות."}
+]

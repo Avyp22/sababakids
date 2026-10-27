@@ -73,6 +73,10 @@ cd frontend && yarn install && yarn start   # frontend/.env : REACT_APP_BACKEND_
 - Non connectables aujourd'hui : Jérusalem (403), Kfar Saba, Herzliya, Bat Yam, Givatayim, Hod Hasharon (anti-bot), Netanya (Cloudflare), Tel Aviv (chargement JavaScript).
 - Ajouter une ville : écrire un `fetch_<ville>()` dans `backend/events_source.py`, l'ajouter à `EVENT_SOURCES` et `FETCHERS`.
 - Santé des sources : `GET /api/sources?refresh=true`. Le workflow `check-event-sources` l'appelle chaque matin et échoue (→ e-mail GitHub) si une source ne renvoie plus rien.
+- **Holon** ne répond qu'aux adresses IP israéliennes : ni Render ni GitHub ne peuvent le lire. Son instantané doit être rafraîchi depuis un ordinateur en Israël, sinon il vieillit et `check-event-sources` échoue (« snapshot too old »).
+  - À la main : `powershell -ExecutionPolicy Bypass -File backend\refresh_holon.ps1` (crée `%LOCALAPPDATA%\sababakids`, récupère Holon, publie sur la branche `event-data`).
+  - Automatiquement chaque jour à 9 h : ouvrir le **Planificateur de tâches** Windows → Créer une tâche de base → nom « SababaKids Holon » → Tous les jours, 09:00 → Démarrer un programme : `powershell`, arguments : `-NoProfile -ExecutionPolicy Bypass -File "C:\Users\avype\sababakids\backend\refresh_holon.ps1"` → Terminer. Puis, dans ses Propriétés → Paramètres, cocher « Exécuter la tâche dès que possible si un démarrage planifié est manqué ».
+    Journal : `%LOCALAPPDATA%\sababakids\refresh_holon.log`.
 
 ## Fonctions à activer (comptes gratuits à créer par toi)
 
@@ -105,6 +109,9 @@ Sans MongoDB tout marche, mais le cache Google repart de zéro à chaque redéma
 
 ### Référencement
 - Pages par ville : `/tel-aviv`, `/haifa`, `/holon`, `/jerusalem`… (liste : `frontend/src/lib/cities.json`), générées au build. Le build interroge l'API : chaque page liste les lieux de la sélection SababaKids proches et les prochains événements familiaux, avec les données `Event` de schema.org pour que Google puisse les afficher dans ses résultats. Si l'API ne répond pas, la page est construite quand même, avec le texte générique.
+- Pages ville × catégorie : `/haifa/parks/`, `/tel-aviv/beaches/`… (catégories : `frontend/src/lib/seo-categories.json` ; les plages seulement pour les villes `coastal` de `cities.json`). Elles ouvrent l'application filtrée sur cette catégorie.
+- Une page par événement familial à venir : `/events/<id>/`, page légère sans l'application, partageable sur WhatsApp, avec données `Event`. Elle disparaît au build suivant la fin de l'événement (l'adresse affiche alors « page introuvable », non indexée).
+- Les résultats Google ne sont pas écrits dans les pages (les conditions de Google interdisent de les stocker) : l'application les charge par-dessus.
 - Événements à jour sur ces pages : la tâche GitHub `refresh-city-pages` relance le build chaque matin. À activer une fois : Render → **sababakids** (site statique) → Settings → Deploy Hook → copier l'URL → GitHub → Settings → Secrets and variables → Actions → **New repository secret** `RENDER_STATIC_DEPLOY_HOOK`.
 - Nom de domaine personnalisé (ex. sababakids.co.il) : l'ajouter dans Render → sababakids → Settings → Custom Domains, puis mettre la variable `PUBLIC_SITE_URL=https://sababakids.co.il` sur le site statique (URLs canoniques et sitemap), remplacer `og:url`, `canonical` et `og:image` dans `frontend/index.html`, ajouter le domaine à `CORS_ORIGINS` du backend, et redéclarer le site dans Search Console. Le faire tôt : changer de domaine plus tard fait perdre le référencement acquis.
 - Google Search Console : <https://search.google.com/search-console> → ajouter le site → soumettre `https://sababakids.onrender.com/sitemap.xml`.

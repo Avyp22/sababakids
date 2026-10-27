@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { track } from "@/lib/analytics";
 import { getWeather, weatherAdvice, weatherEmoji } from "@/lib/weather";
-import CITIES from "@/lib/cities.json";
+import { ROUTE } from "@/lib/routes";
 
 // Leaflet is only downloaded when the Map tab is opened.
 const MapView = lazy(() => import("@/components/MapView"));
@@ -27,8 +27,9 @@ const TABS = [
 
 const DEFAULT_CENTER = { lat: 32.0853, lng: 34.7818, label: "Tel Aviv" };
 
-// SEO city pages (/haifa, /holon...) open the app on that city.
-const URL_CITY = CITIES.find((c) => window.location.pathname.replace(/\/+$/, "") === `/${c.slug}`);
+// SEO pages (/haifa/, /haifa/parks/...) open the app on that city and category.
+const URL_CITY = ROUTE.city;
+const URL_CAT = ROUTE.cat;
 
 const DATE_RANGES = ["all", "today", "tomorrow", "weekend", "week"];
 
@@ -77,7 +78,7 @@ export default function Explore() {
   const [tab, setTab] = useState("list");
   const [locationInput, setLocationInput] = useState(URL_CITY?.query || prefs.location || "Tel Aviv");
   const [radius, setRadius] = useState(prefs.radius || 10);
-  const [category, setCategory] = useState(prefs.category || "all");
+  const [category, setCategory] = useState(URL_CAT?.id || prefs.category || "all");
   const [ages, setAges] = useState(prefs.ages || []);
   const [setting, setSetting] = useState("all");
   const [price, setPrice] = useState("all");
@@ -227,7 +228,13 @@ export default function Explore() {
 
   // City pages: localized title for search engines and shared links.
   useEffect(() => {
-    if (URL_CITY) document.title = `${t("cityTitle", { city: URL_CITY[document.documentElement.lang] || URL_CITY.en })} | SababaKids`;
+    // The prerendered Hebrew title is what search engines should index: only
+    // translate it for visitors who picked a language themselves.
+    let chosen = null;
+    try { chosen = localStorage.getItem("sababakids_lang"); } catch {}
+    if (!URL_CITY || !chosen) return;
+    const city = URL_CITY[document.documentElement.lang] || URL_CITY.en;
+    document.title = `${URL_CAT ? t("cityCatTitle", { cat: t(`cat_${URL_CAT.id}`), city }) : t("cityTitle", { city })} | SababaKids`;
   }, [t]);
   const sortedActivities = useMemo(
     () => (SORTS[sortBy] ? [...activities].sort(SORTS[sortBy]) : activities),

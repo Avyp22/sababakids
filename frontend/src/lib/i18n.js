@@ -9,6 +9,13 @@ export const LANGS = [
 
 const STRINGS = {
   en: {
+    sharePlaceIntro: "More kids outings near you:",
+    cityCatTitle: "{cat} in {city}",
+    notFoundTitle: "Page not found",
+    notFoundText: "This page doesn't exist or the event is over.",
+    backHome: "See activities near you",
+    sharePlace: "Share",
+    shareCopied: "Link copied",
     serverWaking: "Waking up the server, a few more seconds…",
     sortLabel: "Sort by",
     sortDistance: "Nearest",
@@ -117,6 +124,13 @@ const STRINGS = {
     cityTitle: "Kids activities in {city}",
   },
   fr: {
+    sharePlaceIntro: "D'autres sorties pour enfants près de chez vous :",
+    cityCatTitle: "{cat} à {city}",
+    notFoundTitle: "Page introuvable",
+    notFoundText: "Cette page n'existe pas ou l'événement est terminé.",
+    backHome: "Voir les activités près de chez vous",
+    sharePlace: "Partager",
+    shareCopied: "Lien copié",
     serverWaking: "Le serveur se réveille, encore quelques secondes…",
     sortLabel: "Trier par",
     sortDistance: "Plus proches",
@@ -225,6 +239,13 @@ const STRINGS = {
     cityTitle: "Activités pour enfants à {city}",
   },
   he: {
+    sharePlaceIntro: "עוד פעילויות לילדים לידכם:",
+    cityCatTitle: "{cat} ב{city}",
+    notFoundTitle: "הדף לא נמצא",
+    notFoundText: "הדף הזה לא קיים או שהאירוע כבר הסתיים.",
+    backHome: "לפעילויות לידכם",
+    sharePlace: "שיתוף",
+    shareCopied: "הקישור הועתק",
     serverWaking: "השרת מתעורר, עוד כמה שניות…",
     sortLabel: "מיון לפי",
     sortDistance: "הכי קרוב",
