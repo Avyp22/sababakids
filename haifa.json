@@ -1,6 +1,6 @@
 {
  "source": "haifa",
- "generated_at": "2026-11-18T13:43:05.431572+02:00",
+ "generated_at": "2026-11-18T22:31:35.078711+02:00",
  "events": [
   {
    "id": "haifa-1462679-2026-11-27-",
@@ -155,7 +155,7 @@
    "address": "ספריית בית יד לבנים חיפה",
    "lat": 32.794,
    "lng": 34.9896,
-   "image": "https://www.haifa.muni.il/wp-content/uploads/2026/11/40_HAIFA_night_library_banner_500_8003-361x227.jpg",
+   "image": "https://www.haifa.muni.il/wp-content/uploads/2026/11/3-361x227.jpg",
    "time": "20:00",
    "date": "2026-12-07",
    "end_date": null,
@@ -179,7 +179,7 @@
    "address": "ספריית פבזנר",
    "lat": 32.794,
    "lng": 34.9896,
-   "image": "https://www.haifa.muni.il/wp-content/uploads/2026/11/40_HAIFA_night_library_banner_500_8002-361x227.jpg",
+   "image": "https://www.haifa.muni.il/wp-content/uploads/2026/11/4-361x227.jpg",
    "time": "20:00",
    "date": "2026-12-07",
    "end_date": null,
@@ -1811,7 +1811,7 @@
    "address": "בית יד לבנים חיפה",
    "lat": 32.794,
    "lng": 34.9896,
-   "image": "https://www.haifa.muni.il/wp-content/uploads/2026/11/674_web_800x5003-361x227.jpg",
+   "image": "https://www.haifa.muni.il/wp-content/uploads/2026/11/WhatsApp-Image-2026-11-18-at-14.01.11-361x227.jpeg",
    "time": "16:00",
    "date": "2026-12-09",
    "end_date": null,
