@@ -1,9 +1,9 @@
 {
- "at": "2026-11-24T04:14:37.366171+02:00",
+ "at": "2026-11-24T15:46:01.834248+02:00",
  "sources": {
   "haifa": {
-   "ok": false,
-   "error": "HTTPStatusError: Client error '482 unknown' for url 'https://www.haifa.muni.il/culture/city-events/'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/482"
+   "ok": true,
+   "count": 85
   },
   "holon": {
    "ok": false,
